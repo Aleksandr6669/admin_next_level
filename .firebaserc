@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "scool-65535186-b8fdb"
+  },
+  "targets": {
+    "scool-65535186-b8fdb": {
+      "hosting": {
+        "admin": [
+          "admin-5723a"
+        ]
+      }
+    }
+  }
+}

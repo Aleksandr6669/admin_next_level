@@ -1,0 +1,10 @@
+{
+  "fr": [
+    "phoneNumber",
+    "gender"
+  ],
+
+  "uk": [
+    "noInternetConnection"
+  ]
+}
