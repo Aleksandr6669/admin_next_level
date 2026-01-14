@@ -569,6 +569,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search...'**
   String get searchHint;
+
+  /// No description provided for @schoolProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'School Profile'**
+  String get schoolProfile;
+
+  /// No description provided for @users.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get users;
 }
 
 class _AppLocalizationsDelegate

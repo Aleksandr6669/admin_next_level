@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:nextlevel/l10n/app_localizations.dart';
 import 'package:nextlevel/profile_service.dart';
@@ -9,18 +8,14 @@ import 'styles.dart';
 import 'language_selector.dart';
 import 'models/language.dart';
 
-const String _showStoriesKey = 'show_stories';
-
 class SettingsPage extends StatefulWidget {
   final void Function(Locale locale) changeLanguage;
   final void Function(bool) onEditModeChange;
-  final void Function(bool) onShowStoriesChanged;
 
   const SettingsPage({
     super.key,
     required this.changeLanguage,
     required this.onEditModeChange,
-    required this.onShowStoriesChanged,
   });
 
   @override
@@ -29,8 +24,8 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMixin {
   final _profileService = ProfileService();
-  bool _isEditing = false;
-  bool _showStories = true;
+  bool _isProfileEditing = false;
+  bool _isSchoolEditing = false;
   bool _isConnected = true;
 
   final _nameController = TextEditingController();
@@ -40,36 +35,20 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   final _organizationController = TextEditingController();
   final _aboutController = TextEditingController();
 
+  final _schoolNameController = TextEditingController(text: "NextLevel School");
+  final _schoolAboutController = TextEditingController(text: "NextLevel: Online learning platform");
+  final _schoolContactController = TextEditingController(text: "info@nextlevel.com");
+  final _schoolStudentsController = TextEditingController(text: "1500 students");
+
   String _avatarUrl = '';
   late Language _selectedLanguage;
 
-  late final AnimationController _bgAnimationController;
-  late final AnimationController _cardStateAnimationController;
-  late final Animation<double> _editFieldsAnimation;
   final _scrollController = ScrollController();
-
-  double _extraHeight = 0;
-  bool _isExpanded = false;
-  static const double _initialCardHeight = 280;
-  static const double _maxPullDown = 200.0;
 
   @override
   void initState() {
     super.initState();
-    _loadShowStories();
     _loadProfileFromLocalStorage();
-    _bgAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..repeat();
-    _cardStateAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-    _editFieldsAnimation = CurvedAnimation(
-        parent: Tween<double>(begin: 1.0, end: 0.0).animate(_cardStateAnimationController),
-        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-    );
     _subscribeToProfileUpdates();
   }
 
@@ -99,26 +78,6 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
     await prefs.setString('avatarUrl', data['avatarUrl'] ?? '');
   }
 
-  Future<void> _loadShowStories() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        _showStories = prefs.getBool(_showStoriesKey) ?? true;
-      });
-    }
-  }
-
-  Future<void> _setShowStories(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_showStoriesKey, value);
-    if (mounted) {
-      setState(() {
-        _showStories = value;
-      });
-    }
-    widget.onShowStoriesChanged(value);
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -131,19 +90,17 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
 
   @override
   void dispose() {
-    if (_isEditing) {
-      _profileService.finishEditing();
-    }
-    _bgAnimationController.dispose();
-    _cardStateAnimationController.dispose();
     _scrollController.dispose();
-    _profileSubscription?.cancel();
     _nameController.dispose();
     _lastNameController.dispose();
     _roleController.dispose();
     _positionController.dispose();
     _organizationController.dispose();
     _aboutController.dispose();
+    _schoolNameController.dispose();
+    _schoolAboutController.dispose();
+    _schoolContactController.dispose();
+    _schoolStudentsController.dispose();
     super.dispose();
   }
 
@@ -154,12 +111,8 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
       if (userProfile.exists) {
         final data = userProfile.data() as Map<String, dynamic>;
         _saveProfileToLocalStorage(data);
-        if (mounted) {
-            setState(() {
-              _isConnected = true;
-            });
-          }
-        if (!_isEditing) {
+        if (mounted) setState(() => _isConnected = true);
+        if (!_isProfileEditing) {
           _nameController.text = data['name'] ?? '';
           _lastNameController.text = data['lastName'] ?? '';
           _roleController.text = data['role'] ?? '';
@@ -167,46 +120,11 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
           _organizationController.text = data['organization'] ?? '';
           _aboutController.text = data['about'] ?? '';
         }
-        if (mounted) {
-          setState(() {
-            _avatarUrl = data['avatarUrl'] ?? '';
-          });
-        }
+        if (mounted) setState(() => _avatarUrl = data['avatarUrl'] ?? '');
       }
     }, onError: (e) {
-      if (mounted) {
-        setState(() {
-          _isConnected = false;
-        });
-      }
+      if (mounted) setState(() => _isConnected = false);
     });
-  }
-
-  void _scrollToTop() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        0,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeOut,
-      );
-    }
-  }
-
-  Future<void> _setEditing(bool isEditing) async {
-    if (isEditing) {
-      await _profileService.startEditing();
-    } else {
-      await _profileService.finishEditing();
-    }
-
-    _scrollToTop();
-    setState(() => _isEditing = isEditing);
-    widget.onEditModeChange(isEditing);
-    if (isEditing) {
-      _animateCard(false);
-    } else {
-      _subscribeToProfileUpdates();
-    }
   }
 
   Future<void> _updateProfile() async {
@@ -222,391 +140,269 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
       };
       await _profileService.updateUserProfile(dataToUpdate);
       await _saveProfileToLocalStorage(dataToUpdate);
-      await _setEditing(false);
+      setState(() => _isProfileEditing = false);
+      widget.onEditModeChange(false);
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isConnected = false;
-        });
-      }
+      if (mounted) setState(() => _isConnected = false);
     }
   }
 
-  Future<void> _animateCard(bool expand) {
-    _isExpanded = expand;
-    final animation = expand ? _cardStateAnimationController.forward() : _cardStateAnimationController.reverse();
-    return animation.then((_) {
-        if (!expand) {
-          setState(() => _extraHeight = 0);
-        }
-    });
-  }
-
-  bool _onScrollNotification(ScrollNotification notification) {
-    if (notification is OverscrollNotification && notification.dragDetails != null) {
-      if (notification.overscroll > 0) {
-        setState(() {
-          _extraHeight += notification.overscroll / 2;
-          _extraHeight = math.min(_extraHeight, _maxPullDown + 50); 
-        });
-      }
-    } else if (notification is ScrollEndNotification) {
-      if (_extraHeight > _maxPullDown / 2) {
-        if (!_isExpanded) _animateCard(true);
-      } else {
-        if (_isExpanded || _extraHeight > 0) _animateCard(false);
-      }
-    } else if (notification is ScrollUpdateNotification) {
-      if (_isExpanded && _scrollController.offset > 0) {
-        _animateCard(false);
-      }
-    }
-    return false;
-  }
-  
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        bottom: false,
-        child: NotificationListener<ScrollNotification>(
-          onNotification: _onScrollNotification,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-            child: Column(
-              children: [
-                if (!_isConnected)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(
-                      l10n.noInternetConnection,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ),
-                _buildProfileSection(l10n),
-                const SizedBox(height: 20),
-                _buildInfoSection(l10n),
-                const SizedBox(height: 20),
-                _buildBottomSection(l10n),
-                const SizedBox(height: 20),
-                if (!_isEditing) _buildStoriesSwitch(l10n),
-              ],
-            ),
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!_isConnected)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: Text(l10n.noInternetConnection, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
+                ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final cardWidth = constraints.maxWidth > 1100 ? (constraints.maxWidth - 40) / 3 : constraints.maxWidth;
+                  return Wrap(
+                    spacing: 20,
+                    runSpacing: 20,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      _buildColumnWithTitle(l10n.profileTitle, _buildProfileCard(l10n), width: cardWidth),
+                      _buildColumnWithTitle(l10n.schoolProfile, _buildSchoolCard(l10n), width: cardWidth),
+                      _buildColumnWithTitle(l10n.users, _buildUsersCard(l10n), width: cardWidth),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 30),
+              LanguageSelector(
+                selectedLanguage: _selectedLanguage,
+                onLanguageChange: (language) {
+                  if (language != null) {
+                    setState(() => _selectedLanguage = language);
+                    widget.changeLanguage(Locale(language.code));
+                  }
+                },
+              ),
+              const SizedBox(height: 100),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildProfileSection(AppLocalizations l10n) {
-    final double currentHeight = _initialCardHeight + _extraHeight;
-    final expansionValue =_cardStateAnimationController.value;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.easeInOut,
-      height: _isEditing ? 260 : currentHeight,
-      child: GlassmorphicContainer(
-        width: double.infinity,
-        height: double.infinity,
-        borderRadius: 20,
-        blur: 10,
-        border: 0,
-        linearGradient: kGlassmorphicGradient,
-        borderGradient: kGlassmorphicBorderGradient,
-        child: Stack(
-          children: [
-            if (_avatarUrl.isNotEmpty)
-              Positioned.fill(
-                child: Opacity(
-                  opacity: expansionValue,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.network(_avatarUrl, fit: BoxFit.cover, alignment: Alignment.center),
-                  ),
-                ),
-              ),
-            
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(width: double.infinity),
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(end: _isEditing ? 40.0 : 60.0),
-                  duration: const Duration(milliseconds: 100),
-                  builder: (context, radius, child) {
-                    return CircleAvatar(
-                      radius: radius,
-                      backgroundImage: _avatarUrl.isNotEmpty ? NetworkImage(_avatarUrl) : null,
-                      child: _avatarUrl.isEmpty ? Icon(Icons.person, size: radius) : null,
-                    );
-                  },
-                ),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 100),
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: ScaleTransition(scale: animation, child: child),
-                    );
-                  },
-                  child: _isEditing
-                      ? TextButton(
-                          key: const ValueKey('changePhoto'),
-                          onPressed: () { /* TODO: Implement image picker */ },
-                          child: Text(l10n.changePhotoButton, style: const TextStyle(color: Color.fromARGB(211, 24, 109, 179))),
-                        )
-                      : const SizedBox(key: ValueKey('emptyButtonSpace'), height: 25),
-                ),
-
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 100),
-                  transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-                  child: _isEditing 
-                      ? _buildProfileEditContent(l10n) 
-                      : _buildProfileViewContent(l10n),
-                ),
-              ],
-            ),
-
-            if (!_isEditing)
-              Positioned(
-                bottom: 16,
-                left: 16,
-                child: FadeTransition(
-                  opacity: _cardStateAnimationController,
-                  child: Text(
-                    '${_nameController.text}\n${_lastNameController.text}',
-                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, shadows: [Shadow(blurRadius: 8.0, color: Colors.black54)]),
-                  ),
-                ),
-              ),
-            if (!_isEditing)
-              Positioned(
-                top: 16,
-                right: 16,
-                child: FadeTransition(
-                  opacity: _cardStateAnimationController,
-                  child: IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.white),
-                    onPressed: _isConnected ? () => _setEditing(true) : null,
-                    style: IconButton.styleFrom(backgroundColor: Colors.black.withOpacity(0.2), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileViewContent(AppLocalizations l10n) {
-    return FadeTransition(
-      key: const ValueKey('profileView'),
-      opacity: Tween<double>(begin: 1.0, end: 0.0).animate(_cardStateAnimationController),
+  Widget _buildColumnWithTitle(String title, Widget content, {required double width}) {
+    return SizedBox(
+      width: width,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoDisplay('', '${_nameController.text} ${_lastNameController.text}', isFullName: true),
-          const SizedBox(height: 10),
-            TextButton.icon(
-              icon: const Icon(Icons.edit, size: 16, color: Colors.white70),
-              label: Text(l10n.editProfile, style: const TextStyle(color: Colors.white70)),
-              onPressed: _isConnected ? () => _setEditing(true) : null,
-            ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildProfileEditContent(AppLocalizations l10n) {
-    return FadeTransition(
-      opacity: _editFieldsAnimation,
-      child: Padding(
-        key: const ValueKey('profileEdit'),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildTextField(_nameController, l10n.firstName),
-            const SizedBox(height: 10),
-            _buildTextField(_lastNameController, l10n.lastName),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoSection(AppLocalizations l10n) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.easeInOut,
-      width: double.infinity,
-      height: _isEditing ? 340 : 300,
-      child: GlassmorphicContainer(
-        width: double.infinity,
-        height: double.infinity,
-        borderRadius: 20,
-        blur: 10,
-        border: 0,
-        linearGradient: kGlassmorphicGradient,
-        borderGradient: kGlassmorphicBorderGradient,
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 100),
-          transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
-          child: _isEditing ? _buildInfoEditContent(l10n) : _buildInfoViewContent(l10n),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoViewContent(AppLocalizations l10n) {
-    return Padding(
-      key: const ValueKey('infoView'),
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildInfoDisplay(l10n.role, _roleController.text),
-          _buildInfoDisplay(l10n.position, _positionController.text),
-          _buildInfoDisplay(l10n.organization, _organizationController.text),
-          _buildInfoDisplay(l10n.aboutMe, _aboutController.text),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoEditContent(AppLocalizations l10n) {
-    return FadeTransition(
-      opacity: _editFieldsAnimation,
-      child: Padding(
-        key: const ValueKey('infoEdit'),
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildTextField(_roleController, l10n.role),
-            const SizedBox(height: 10),
-            _buildTextField(_positionController, l10n.position),
-            const SizedBox(height: 10),
-            _buildTextField(_organizationController, l10n.organization),
-            const SizedBox(height: 10),
-            _buildTextField(_aboutController, l10n.aboutMe, maxLines: 3),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomSection(AppLocalizations l10n) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 100),
-      transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: SlideTransition(
-            position: Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(animation),
-            child: child,
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, bottom: 12.0),
+            child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
           ),
-        );
-      },
-      child: _isEditing
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  key: const ValueKey('saveButton'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
-                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  ),
-                  onPressed: _updateProfile,
-                  child: Text(l10n.saveChanges, style: const TextStyle(color: Colors.white)),
-                ),
-              ],
-            )
-          : LanguageSelector(
-              key: const ValueKey('languageSelector'),
-              selectedLanguage: _selectedLanguage,
-              onLanguageChange: (language) {
-                if (language != null) {
-                  setState(() => _selectedLanguage = language);
-                  widget.changeLanguage(Locale(language.code));
-                }
-              },
-            ),
+          content,
+        ],
+      ),
     );
   }
 
-  Widget _buildStoriesSwitch(AppLocalizations l10n) {
+  Widget _buildProfileCard(AppLocalizations l10n) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 60,
-      borderRadius: 35,
-      blur: 10,
-      alignment: Alignment.center,
-      border: 0,
+      height: 550,
+      borderRadius: 20,
+      blur: 15,
+      border: 1,
       linearGradient: kGlassmorphicGradient,
       borderGradient: kGlassmorphicBorderGradient,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
           children: [
-            Text(l10n.showStories, style: const TextStyle(color: Colors.white, fontSize: 16)),
-            Switch(
-              value: _showStories,
-              onChanged: _setShowStories,
-              activeThumbColor: Colors.blue,
-              inactiveTrackColor: Colors.white30,
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: _avatarUrl.isNotEmpty ? NetworkImage(_avatarUrl) : null,
+              child: _avatarUrl.isEmpty ? const Icon(Icons.person, size: 50) : null,
             ),
+            const SizedBox(height: 15),
+            if (!_isProfileEditing) ...[
+              Text('${_nameController.text} ${_lastNameController.text}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              TextButton.icon(
+                icon: const Icon(Icons.edit, size: 16, color: Colors.blueAccent),
+                label: Text(l10n.editProfile, style: const TextStyle(color: Colors.blueAccent)),
+                onPressed: () => setState(() => _isProfileEditing = true),
+              ),
+              const Spacer(),
+              _buildInfoRow(l10n.role, _roleController.text),
+              _buildInfoRow(l10n.position, _positionController.text),
+              _buildInfoRow(l10n.organization, _organizationController.text),
+              _buildInfoRow(l10n.aboutMe, _aboutController.text, maxLines: 2),
+            ] else ...[
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildTextField(_nameController, l10n.firstName),
+                    _buildTextField(_lastNameController, l10n.lastName),
+                    _buildTextField(_roleController, l10n.role),
+                    _buildTextField(_positionController, l10n.position),
+                    _buildTextField(_organizationController, l10n.organization),
+                    _buildTextField(_aboutController, l10n.aboutMe, maxLines: 2),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(onPressed: () => setState(() => _isProfileEditing = false), child: const Text("Cancel")),
+                  ElevatedButton(onPressed: _updateProfile, child: Text(l10n.saveChanges)),
+                ],
+              )
+            ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSchoolCard(AppLocalizations l10n) {
+    return GlassmorphicContainer(
+      width: double.infinity,
+      height: 550,
+      borderRadius: 20,
+      blur: 15,
+      border: 1,
+      linearGradient: kGlassmorphicGradient,
+      borderGradient: kGlassmorphicBorderGradient,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.school, color: Colors.white)),
+                SizedBox(width: 15),
+                Text("School Info", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 20),
+            if (!_isSchoolEditing) ...[
+              _buildInfoRow("Name", _schoolNameController.text),
+              _buildInfoRow("About", _schoolAboutController.text),
+              _buildInfoRow("Contact", _schoolContactController.text),
+              _buildInfoRow("Students", _schoolStudentsController.text),
+              const Spacer(),
+              Center(
+                child: TextButton.icon(
+                  icon: const Icon(Icons.edit, size: 16, color: Colors.blueAccent),
+                  label: const Text("Edit School", style: TextStyle(color: Colors.blueAccent)),
+                  onPressed: () => setState(() => _isSchoolEditing = true),
+                ),
+              ),
+            ] else ...[
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildTextField(_schoolNameController, "Name"),
+                    _buildTextField(_schoolAboutController, "About"),
+                    _buildTextField(_schoolContactController, "Contact"),
+                    _buildTextField(_schoolStudentsController, "Students"),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(onPressed: () => setState(() => _isSchoolEditing = false), child: const Text("Cancel")),
+                  ElevatedButton(onPressed: () => setState(() => _isSchoolEditing = false), child: const Text("Save")),
+                ],
+              )
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUsersCard(AppLocalizations l10n) {
+    final mockUsers = ["Иван Петров", "Мария Сидорова", "Алексей Ковалев", "Елена Смирнова", "Сергей Новиков", "Андрей Федоров", "Юлия Котова"];
+    return GlassmorphicContainer(
+      width: double.infinity,
+      height: 550,
+      borderRadius: 20,
+      blur: 15,
+      border: 1,
+      linearGradient: kGlassmorphicGradient,
+      borderGradient: kGlassmorphicBorderGradient,
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Row(
+              children: [
+                CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people, color: Colors.white)),
+                SizedBox(width: 15),
+                Text("User List", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              itemCount: mockUsers.length,
+              separatorBuilder: (_, __) => const Divider(color: Colors.white10),
+              itemBuilder: (context, index) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const CircleAvatar(radius: 15, backgroundColor: Colors.white24, child: Icon(Icons.person, size: 15, color: Colors.white)),
+                title: Text(mockUsers[index], style: const TextStyle(color: Colors.white, fontSize: 14)),
+                trailing: const Icon(Icons.chevron_right, color: Colors.white24),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String title, String value, {int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+          Text(value.isEmpty ? '-' : value,
+              maxLines: maxLines,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 16)),
+          const Divider(color: Colors.white10),
+        ],
       ),
     );
   }
 
   Widget _buildTextField(TextEditingController controller, String label, {int maxLines = 1}) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      style: const TextStyle(color: Colors.white, fontSize: 16),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70, fontSize: 12),
-        enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-        focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-        isDense: true,
-      ),
-    );
-  }
-
-  Widget _buildInfoDisplay(String title, String value, {bool isFullName = false}) {
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: isFullName ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (!isFullName)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4.0),
-              child: Text(title, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-            ),
-          Text(
-            value.isEmpty ? '-' : value,
-            textAlign: isFullName ? TextAlign.center : TextAlign.start,
-            style: TextStyle(color: Colors.white, fontSize: isFullName ? 22 : 16, fontWeight: isFullName ? FontWeight.bold : FontWeight.normal),
-          ),
-          if (!isFullName)
-            const Divider(color: Colors.white24, height: 16, thickness: 0.5),
-        ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.white60),
+          enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+          focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+        ),
       ),
     );
   }

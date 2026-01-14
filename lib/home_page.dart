@@ -166,7 +166,6 @@ class _HomePageState extends State<HomePage> {
       SettingsPage(
         changeLanguage: widget.changeLanguage,
         onEditModeChange: _handleSettingsEditModeChange,
-        onShowStoriesChanged: _handleShowStoriesChange,
       ),
     ];
 

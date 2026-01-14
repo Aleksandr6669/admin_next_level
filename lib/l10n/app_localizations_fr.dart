@@ -258,4 +258,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get searchHint => 'Rechercher...';
+
+  @override
+  String get schoolProfile => 'Profil de l\'école';
+
+  @override
+  String get users => 'Utilisateurs';
 }

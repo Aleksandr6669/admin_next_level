@@ -82,5 +82,7 @@
     "profileLocked": "Le profil est en cours de modification sur un autre appareil.",
     "noInternetConnection": "Pas de connexion Internet",
     "adminPanel": "Panneau d'administration",
-    "searchHint": "Rechercher..."
+    "searchHint": "Rechercher...",
+    "schoolProfile": "Profil de l'école",
+    "users": "Utilisateurs"
 }

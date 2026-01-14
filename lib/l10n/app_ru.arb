@@ -84,5 +84,7 @@
     "profileLocked": "Профиль редактируется на другом устройстве.",
     "noInternetConnection": "Нет подключения к интернету",
     "adminPanel": "Админ панель",
-    "searchHint": "Поиск..."
+    "searchHint": "Поиск...",
+    "schoolProfile": "Профиль школы",
+    "users": "Пользователи"
 }

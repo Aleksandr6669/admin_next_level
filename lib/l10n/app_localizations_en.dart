@@ -252,4 +252,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchHint => 'Search...';
+
+  @override
+  String get schoolProfile => 'School Profile';
+
+  @override
+  String get users => 'Users';
 }

@@ -91,5 +91,7 @@
     "profileLocked": "Profile is being edited on another device.",
     "noInternetConnection": "No internet connection",
     "adminPanel": "Admin Panel",
-    "searchHint": "Search..."
+    "searchHint": "Search...",
+    "schoolProfile": "School Profile",
+    "users": "Users"
 }

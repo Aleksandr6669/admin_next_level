@@ -257,4 +257,10 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get searchHint => 'Пошук...';
+
+  @override
+  String get schoolProfile => 'Профіль школи';
+
+  @override
+  String get users => 'Користувачі';
 }

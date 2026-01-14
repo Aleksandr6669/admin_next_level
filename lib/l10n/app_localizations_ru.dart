@@ -258,4 +258,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get searchHint => 'Поиск...';
+
+  @override
+  String get schoolProfile => 'Профиль школы';
+
+  @override
+  String get users => 'Пользователи';
 }

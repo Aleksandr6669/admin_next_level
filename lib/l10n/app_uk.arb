@@ -83,5 +83,7 @@
     "showStories": "Показувати історії",
     "profileLocked": "Профіль редагується на іншому пристрої.",
     "adminPanel": "Адмін панель",
-    "searchHint": "Пошук..."
+    "searchHint": "Пошук...",
+    "schoolProfile": "Профіль школи",
+    "users": "Користувачі"
 }
