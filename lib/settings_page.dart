@@ -23,7 +23,7 @@ class SettingsPage extends StatefulWidget {
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMixin {
+class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final _profileService = ProfileService();
   bool _isProfileEditing = false;
   bool _isSchoolEditing = false;
@@ -56,6 +56,9 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   late Language _selectedLanguage;
 
   final _scrollController = ScrollController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -167,6 +170,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Add this line
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -559,6 +563,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                       ElevatedButton(
                         onPressed: () {
                           final updatedData = {
+                            "avatarUrl": avatarUrl,
                             'name': _editUserNameController.text,
                             'lastName': _editUserLastNameController.text,
                             'email': _editUserEmailController.text,
