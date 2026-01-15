@@ -1,10 +1,9 @@
 {
   "fr": [
     "phoneNumber",
-    "gender"
-  ],
-
-  "uk": [
-    "noInternetConnection"
+    "gender",
+    "tooltipCollapse",
+    "tooltipExpand",
+    "accessDeniedNotAdmin"
   ]
 }

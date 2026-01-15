@@ -267,4 +267,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get users => 'Utilisateurs';
+
+  @override
+  String get tooltipCollapse => 'Collapse';
+
+  @override
+  String get tooltipExpand => 'Expand';
+
+  @override
+  String get accessDeniedNotAdmin => 'Access denied. Only admins can log in.';
 }

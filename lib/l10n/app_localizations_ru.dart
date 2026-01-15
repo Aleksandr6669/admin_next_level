@@ -41,13 +41,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pleaseEnterYourEmail =>
-      'Пожалуйста, введите свою электронную почту';
+      'Пожалуйста, введите вашу электронную почту';
 
   @override
-  String get pleaseEnterYourPassword => 'Пожалуйста, введите свой пароль';
+  String get pleaseEnterYourPassword => 'Пожалуйста, введите ваш пароль';
 
   @override
-  String get pleaseConfirmYourPassword => 'Пожалуйста, подтвердите свой пароль';
+  String get pleaseConfirmYourPassword => 'Пожалуйста, подтвердите ваш пароль';
 
   @override
   String get passwordsDoNotMatch => 'Пароли не совпадают';
@@ -83,14 +83,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get bottomNavProgress => 'Прогресс';
 
   @override
-  String get logout => 'Выход';
+  String get logout => 'Выйти';
 
   @override
   String get enterVerificationCode => 'Введите код подтверждения';
 
   @override
   String get verificationCodeSent =>
-      'Код подтверждения отправлен на вашу электронную почту.';
+      'Код подтверждения был отправлен на вашу электронную почту.';
 
   @override
   String get verificationCode => 'Код подтверждения';
@@ -112,12 +112,11 @@ class AppLocalizationsRu extends AppLocalizations {
       'Пользователь с такой электронной почтой не найден. Пожалуйста, зарегистрируйтесь.';
 
   @override
-  String get wrongPassword =>
-      'Неверный пароль. Пожалуйста, попробуйте еще раз.';
+  String get wrongPassword => 'Неверный пароль.';
 
   @override
   String get emailAlreadyInUse =>
-      'Эта электронная почта уже используется. Пожалуйста, войдите.';
+      'Этот адрес электронной почты уже используется другим аккаунтом.';
 
   @override
   String get authenticationFailed =>
@@ -128,24 +127,24 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get userDisabled =>
-      'Этот пользователь был отключен. Пожалуйста, свяжитесь со службой поддержки.';
+      'Этот пользователь был отключен. Пожалуйста, свяжитесь с поддержкой.';
 
   @override
-  String get invalidEmail => 'Неверный адрес электронной почты.';
+  String get invalidEmail => 'Неверный формат электронной почты.';
 
   @override
   String get weakPassword => 'Пароль слишком слабый.';
 
   @override
   String get tooManyRequests =>
-      'Слишком много запросов. Пожалуйста, попробуйте еще раз позже.';
+      'Слишком много запросов. Пожалуйста, попробуйте позже.';
 
   @override
-  String get verifyYourEmail => 'Подтвердите свою электронную почту';
+  String get verifyYourEmail => 'Подтвердите вашу электронную почту';
 
   @override
   String verificationLinkSent(String email) {
-    return 'Ссылка для подтверждения отправлена на адрес $email. Проверьте свой почтовый ящик и следуйте инструкциям, чтобы завершить регистрацию.';
+    return 'Ссылка для подтверждения была отправлена на $email. Пожалуйста, проверьте ваш почтовый ящик и следуйте инструкциям для завершения регистрации.';
   }
 
   @override
@@ -153,7 +152,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Нажмите кнопку ниже, чтобы завершить подтверждение электронной почты.';
 
   @override
-  String get resendEmail => 'Отправить электронное письмо повторно';
+  String get resendEmail => 'Отправить письмо еще раз';
 
   @override
   String get cancel => 'Отмена';
@@ -172,23 +171,23 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get passwordResetSuccess =>
-      'Пароль успешно сброшен. Теперь вы можете войти с новым паролем.';
+      'Ваш пароль был успешно сброшен. Теперь вы можете войти с новым паролем.';
 
   @override
   String get passwordResetFailed =>
-      'Не удалось сбросить пароль. Ссылка может быть недействительной или устаревшей.';
+      'Не удалось сбросить пароль. Ссылка может быть недействительной или просроченной.';
 
   @override
   String resetPasswordLinkSent(String email) {
-    return 'Ссылка для сброса пароля отправлена на адрес $email. Пожалуйста, проверьте свой почтовый ящик.';
+    return 'Ссылка для сброса пароля была отправлена на $email. Пожалуйста, проверьте ваш почтовый ящик.';
   }
 
   @override
   String get resetPasswordInstructions =>
-      'Введите свой адрес электронной почты, и мы вышлем вам ссылку для восстановления доступа к вашей учетной записи.';
+      'Введите ваш адрес электронной почты, и мы вышлем вам ссылку для сброса пароля.';
 
   @override
-  String get sendResetLink => 'Отправить ссылку';
+  String get sendResetLink => 'Отправить ссылку для сброса';
 
   @override
   String get backToLogin => 'Вернуться ко входу';
@@ -248,7 +247,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get changePhotoButton => 'Изменить фото';
 
   @override
-  String get showStories => 'Показывать истории';
+  String get showStories => 'Показать истории';
 
   @override
   String get profileLocked => 'Профиль редактируется на другом устройстве.';
@@ -257,7 +256,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noInternetConnection => 'Нет подключения к интернету';
 
   @override
-  String get adminPanel => 'Админ панель';
+  String get adminPanel => 'Админ-панель';
 
   @override
   String get searchHint => 'Поиск...';
@@ -267,4 +266,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get users => 'Пользователи';
+
+  @override
+  String get tooltipCollapse => 'Свернуть';
+
+  @override
+  String get tooltipExpand => 'Развернуть';
+
+  @override
+  String get accessDeniedNotAdmin =>
+      'Доступ запрещен. Вход только для администраторов.';
 }

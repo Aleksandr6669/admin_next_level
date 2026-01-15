@@ -587,6 +587,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Users'**
   String get users;
+
+  /// No description provided for @tooltipCollapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get tooltipCollapse;
+
+  /// No description provided for @tooltipExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand'**
+  String get tooltipExpand;
+
+  /// No description provided for @accessDeniedNotAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Access denied. Only admins can log in.'**
+  String get accessDeniedNotAdmin;
 }
 
 class _AppLocalizationsDelegate

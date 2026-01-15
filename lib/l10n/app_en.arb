@@ -94,5 +94,8 @@
     "adminPanel": "Admin Panel",
     "searchHint": "Search...",
     "schoolProfile": "School Profile",
-    "users": "Users"
+    "users": "Users",
+    "tooltipCollapse": "Collapse",
+    "tooltipExpand": "Expand",
+    "accessDeniedNotAdmin": "Access denied. Only admins can log in."
 }

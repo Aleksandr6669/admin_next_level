@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nextlevel/courses_page.dart';
 import 'package:nextlevel/feed_page.dart';
+import 'package:nextlevel/liquid_nav_bar.dart';
 import 'package:nextlevel/parallax_background.dart';
 import 'package:nextlevel/progress_page.dart';
 import 'package:nextlevel/settings_page.dart';
@@ -39,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   late Future<AppUser> _userFuture;
   final _profileService = ProfileService();
   StreamSubscription? _profileSubscription;
+  bool _isExpanded = true;
 
   @override
   void initState() {
@@ -155,6 +157,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _toggleSidebar() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
   Future<void> _logout() async {
     await auth.FirebaseAuth.instance.signOut();
   }
@@ -202,8 +210,13 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: Row(
                       children: <Widget>[
-                        _buildGlassmorphicSideNavBar(
-                            context, navItems, navBarIndex),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          width: _isExpanded ? 180 : 72,
+                          child: _buildGlassmorphicSideNavBar(
+                              context, navItems, navBarIndex),
+                        ),
                         const VerticalDivider(thickness: 1, width: 1),
                         Expanded(
                           child: IndexedStack(
@@ -326,61 +339,62 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildGlassmorphicSideNavBar(
       BuildContext context, List<Map<String, dynamic>> navItems, int navBarIndex) {
-    return Stack(
-      children: [
-        GlassmorphicContainer(
-          width: 200,
-          height: double.infinity,
-          borderRadius: 0,
-          blur: 7,
-          alignment: Alignment.center,
-          border: 0,
-          linearGradient: kDropdownGradient,
-          borderGradient: kAppBarBorderGradient,
-          child: const SizedBox.shrink(),
-        ),
-        SizedBox(
-          width: 200,
-          child: Column(
-            children: [
-              Expanded(
-                child: NavigationRail(
-                  extended: true,
-                  selectedIndex: navBarIndex,
-                  onDestinationSelected: _onItemTapped,
-                  backgroundColor: Colors.transparent,
-                  indicatorColor: kBottomNavSelectedItemColor.withOpacity(0.2),
-                  selectedIconTheme: const IconThemeData(color: kBottomNavSelectedItemColor, size: 25),
-                  unselectedIconTheme: const IconThemeData(color: kBottomNavUnselectedItemColor, size: 23),
-                  selectedLabelTextStyle: const TextStyle(color: kBottomNavSelectedItemColor, fontSize: 14),
-                  unselectedLabelTextStyle: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 12),
-                  destinations: navItems.map((item) {
-                    return NavigationRailDestination(
-                      icon: Icon(item['icon']),
-                      label: Text(item['label']),
-                    );
-                  }).toList(),
+    return GlassmorphicContainer(
+      width: double.infinity,
+      height: double.infinity,
+      borderRadius: 0,
+      blur: 7,
+      alignment: Alignment.center,
+      border: 0,
+      linearGradient: kDropdownGradient,
+      borderGradient: kAppBarBorderGradient,
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          Align(
+            alignment: _isExpanded ? Alignment.centerRight : Alignment.center,
+            child: Padding(
+              padding: EdgeInsets.only(right: _isExpanded ? 16.0 : 0.0),
+              child: IconButton(
+                onPressed: _toggleSidebar,
+                icon: Icon(
+                  _isExpanded ? Icons.chevron_left : Icons.chevron_right,
+                  color: Colors.white,
                 ),
+                tooltip: _isExpanded ? l10n.tooltipCollapse : l10n.tooltipExpand,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: kBottomNavUnselectedItemColor.withOpacity(0.5)),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.logout, color: kBottomNavUnselectedItemColor),
-                    title: Text(l10n.logout, style: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 14)),
-                    onTap: _logout,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
-        ),
-      ],
+          Expanded(
+            child: LiquidNavBar(
+              selectedIndex: navBarIndex,
+              onTap: _onItemTapped,
+              items: navItems,
+              selectedItemColor: kBottomNavSelectedItemColor,
+              unselectedItemColor: kBottomNavUnselectedItemColor,
+              direction: Axis.vertical,
+              extended: _isExpanded,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: kBottomNavUnselectedItemColor.withOpacity(0.5)),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.logout, color: kBottomNavUnselectedItemColor),
+                title: _isExpanded
+                    ? Text(l10n.logout, style: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 14))
+                    : const SizedBox.shrink(),
+                onTap: _logout,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }

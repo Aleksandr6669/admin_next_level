@@ -13,7 +13,7 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get joinUsToStartYourJourney =>
-      'Приєднуйтесь до нас, щоб розпочати свою подорож';
+      'Приєднуйтесь до нас, щоб почати свою подорож';
 
   @override
   String get email => 'Електронна пошта';
@@ -22,7 +22,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get password => 'Пароль';
 
   @override
-  String get confirmPassword => 'Підтвердьте пароль';
+  String get confirmPassword => 'Підтвердіть пароль';
 
   @override
   String get signUp => 'Зареєструватися';
@@ -37,20 +37,20 @@ class AppLocalizationsUk extends AppLocalizations {
   String get welcomeBack => 'З поверненням!';
 
   @override
-  String get dontHaveAnAccount => 'Немає акаунту? ';
+  String get dontHaveAnAccount => 'Немає акаунта? ';
 
   @override
   String get pleaseEnterYourEmail =>
-      'Будь ласка, введіть свою електронну пошту';
+      'Будь ласка, введіть вашу електронну пошту';
 
   @override
-  String get pleaseEnterYourPassword => 'Будь ласка, введіть свій пароль';
+  String get pleaseEnterYourPassword => 'Будь ласка, введіть ваш пароль';
 
   @override
-  String get pleaseConfirmYourPassword => 'Будь ласка, підтвердьте свій пароль';
+  String get pleaseConfirmYourPassword => 'Будь ласка, підтвердіть ваш пароль';
 
   @override
-  String get passwordsDoNotMatch => 'Паролі не співпадають';
+  String get passwordsDoNotMatch => 'Паролі не збігаються';
 
   @override
   String get language => 'Мова';
@@ -71,7 +71,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get bottomNavFeed => 'Стрічка';
 
   @override
-  String get bottomNavSettings => 'Налаш-ння';
+  String get bottomNavSettings => 'Налаштування';
 
   @override
   String get bottomNavCourses => 'Курси';
@@ -83,14 +83,14 @@ class AppLocalizationsUk extends AppLocalizations {
   String get bottomNavProgress => 'Прогрес';
 
   @override
-  String get logout => 'Вихід';
+  String get logout => 'Вийти';
 
   @override
   String get enterVerificationCode => 'Введіть код підтвердження';
 
   @override
   String get verificationCodeSent =>
-      'Код підтвердження надіслано на вашу електронну пошту.';
+      'Код підтвердження було надіслано на вашу електронну пошту.';
 
   @override
   String get verificationCode => 'Код підтвердження';
@@ -112,11 +112,11 @@ class AppLocalizationsUk extends AppLocalizations {
       'Користувача з такою електронною поштою не знайдено. Будь ласка, зареєструйтесь.';
 
   @override
-  String get wrongPassword => 'Невірний пароль. Будь ласка, спробуйте ще раз.';
+  String get wrongPassword => 'Невірний пароль.';
 
   @override
   String get emailAlreadyInUse =>
-      'Ця електронна пошта вже використовується. Будь ласка, увійдіть.';
+      'Ця адреса електронної пошти вже використовується іншим акаунтом.';
 
   @override
   String get authenticationFailed =>
@@ -127,24 +127,24 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get userDisabled =>
-      'Цього користувача було вимкнено. Будь ласка, зв\'яжіться зі службою підтримки.';
+      'Цього користувача було вимкнено. Будь ласка, зв’яжіться з підтримкою.';
 
   @override
-  String get invalidEmail => 'Невірна адреса електронної пошти.';
+  String get invalidEmail => 'Невірний формат електронної пошти.';
 
   @override
   String get weakPassword => 'Пароль занадто слабкий.';
 
   @override
   String get tooManyRequests =>
-      'Забагато запитів. Будь ласка, спробуйте ще раз пізніше.';
+      'Забагато запитів. Будь ласка, спробуйте пізніше.';
 
   @override
-  String get verifyYourEmail => 'Підтвердьте свою електронну пошту';
+  String get verifyYourEmail => 'Підтвердіть вашу електронну пошту';
 
   @override
   String verificationLinkSent(String email) {
-    return 'Посилання для підтвердження надіслано на адресу $email. Перевірте свою поштову скриньку та дотримуйтесь інструкцій, щоб завершити реєстрацію.';
+    return 'Посилання для підтвердження було надіслано на $email. Будь ласка, перевірте вашу поштову скриньку та дотримуйтесь інструкцій для завершення реєстрації.';
   }
 
   @override
@@ -152,7 +152,7 @@ class AppLocalizationsUk extends AppLocalizations {
       'Натисніть кнопку нижче, щоб завершити підтвердження електронної пошти.';
 
   @override
-  String get resendEmail => 'Надіслати лист повторно';
+  String get resendEmail => 'Надіслати лист ще раз';
 
   @override
   String get cancel => 'Скасувати';
@@ -167,7 +167,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get newPassword => 'Новий пароль';
 
   @override
-  String get confirmNewPassword => 'Підтвердьте новий пароль';
+  String get confirmNewPassword => 'Підтвердіть новий пароль';
 
   @override
   String get passwordResetSuccess =>
@@ -179,15 +179,15 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String resetPasswordLinkSent(String email) {
-    return 'Посилання для скидання пароля надіслано на адресу $email. Будь ласка, перевірте свою поштову скриньку.';
+    return 'Посилання для скидання пароля було надіслано на $email. Будь ласка, перевірте вашу поштову скриньку.';
   }
 
   @override
   String get resetPasswordInstructions =>
-      'Введіть свою адресу електронної пошти, і ми надішлемо вам посилання для скидання пароля.';
+      'Введіть вашу адресу електронної пошти, і ми надішлемо вам посилання для скидання пароля.';
 
   @override
-  String get sendResetLink => 'Надіслати посилання';
+  String get sendResetLink => 'Надіслати посилання для скидання';
 
   @override
   String get backToLogin => 'Повернутися до входу';
@@ -199,16 +199,16 @@ class AppLocalizationsUk extends AppLocalizations {
   String get editProfileButton => 'Редагувати профіль';
 
   @override
-  String get firstName => 'Ім\'я';
+  String get firstName => 'Ім’я';
 
   @override
-  String get pleaseEnterFirstName => 'Будь ласка, введіть своє ім\'я';
+  String get pleaseEnterFirstName => 'Будь ласка, введіть ваше ім’я';
 
   @override
   String get lastName => 'Прізвище';
 
   @override
-  String get pleaseEnterLastName => 'Будь ласка, введіть своє прізвище';
+  String get pleaseEnterLastName => 'Будь ласка, введіть ваше прізвище';
 
   @override
   String get role => 'Роль';
@@ -244,7 +244,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get editProfile => 'Редагувати профіль';
 
   @override
-  String get changePhotoButton => 'Змінити фотографію';
+  String get changePhotoButton => 'Змінити фото';
 
   @override
   String get showStories => 'Показувати історії';
@@ -253,10 +253,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get profileLocked => 'Профіль редагується на іншому пристрої.';
 
   @override
-  String get noInternetConnection => 'No internet connection';
+  String get noInternetConnection => 'Немає підключення до Інтернету';
 
   @override
-  String get adminPanel => 'Адмін панель';
+  String get adminPanel => 'Адмін-панель';
 
   @override
   String get searchHint => 'Пошук...';
@@ -266,4 +266,14 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get users => 'Користувачі';
+
+  @override
+  String get tooltipCollapse => 'Згорнути';
+
+  @override
+  String get tooltipExpand => 'Розгорнути';
+
+  @override
+  String get accessDeniedNotAdmin =>
+      'Доступ заборонено. Вхід тільки для адміністраторів.';
 }

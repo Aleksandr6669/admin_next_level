@@ -79,9 +79,18 @@ class _AuthPageState extends State<AuthPage> {
             email: _emailController.text,
             password: _passwordController.text,
           );
-          await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).update({
-            'lastLoginDate': Timestamp.now(),
-          });
+
+          final userDoc = await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).get();
+          final userRole = userDoc.data()?['role'];
+
+          if (userRole != 'Admin') {
+            await FirebaseAuth.instance.signOut();
+            throw FirebaseAuthException(code: 'admin-only-access');
+          } else {
+             await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).update({
+              'lastLoginDate': Timestamp.now(),
+            });
+          }
         } else {
           // Create user
           UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -111,12 +120,13 @@ class _AuthPageState extends State<AuthPage> {
         }
       } on FirebaseAuthException catch (e) {
         if (!mounted) return;
-        // ignore: use_build_context_synchronously
         final context = _formKey.currentContext!;
-        // ignore: use_build_context_synchronously
         final l10n = AppLocalizations.of(context)!;
         String errorMessage;
         switch (e.code) {
+          case 'admin-only-access':
+            errorMessage = l10n.accessDeniedNotAdmin;
+            break;
           case 'user-not-found':
             errorMessage = l10n.userNotFound;
             break;
@@ -141,7 +151,6 @@ class _AuthPageState extends State<AuthPage> {
           default:
             errorMessage = l10n.authenticationFailed;
         }
-        // ignore: use_build_context_synchronously
         _showErrorSnackBar(context, errorMessage);
       } finally {
         if (mounted) {
@@ -155,11 +164,8 @@ class _AuthPageState extends State<AuthPage> {
 
   void _handleForgotPasswordAction() async {
     if (_emailController.text.isEmpty) {
-       // ignore: use_build_context_synchronously
        final context = _formKey.currentContext!;
-       // ignore: use_build_context_synchronously
        final l10n = AppLocalizations.of(context)!;
-      // ignore: use_build_context_synchronously
       _showErrorSnackBar(context, l10n.pleaseEnterYourEmail);
       return;
     }
@@ -170,18 +176,13 @@ class _AuthPageState extends State<AuthPage> {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
       if(!mounted) return;
-      // ignore: use_build_context_synchronously
       final context = _formKey.currentContext!;
-      // ignore: use_build_context_synchronously
       final l10n = AppLocalizations.of(context)!;
-      // ignore: use_build_context_synchronously
       _showSuccessSnackBar(context, l10n.resetPasswordLinkSent( _emailController.text));
       _toggleForgotPassword(); // Go back to login view on success
     } on FirebaseAuthException catch (e) {
         if (!mounted) return;
-        // ignore: use_build_context_synchronously
         final context = _formKey.currentContext!;
-        // ignore: use_build_context_synchronously
         final l10n = AppLocalizations.of(context)!;
        String errorMessage;
         switch (e.code) {
@@ -197,7 +198,6 @@ class _AuthPageState extends State<AuthPage> {
           default:
             errorMessage = l10n.authenticationFailed;
         }
-        // ignore: use_build_context_synchronously
         _showErrorSnackBar(context, errorMessage);
     } finally {
       if(mounted) {
