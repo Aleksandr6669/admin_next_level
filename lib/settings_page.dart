@@ -23,7 +23,7 @@ class SettingsPage extends StatefulWidget {
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMixin {
   final _profileService = ProfileService();
   bool _isProfileEditing = false;
   bool _isSchoolEditing = false;
@@ -41,28 +41,16 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   final _schoolContactController = TextEditingController(text: "info@nextlevel.com");
   final _schoolStudentsController = TextEditingController(text: "1500 students");
 
-  String? _editingUserId;
-  Map<String, dynamic>? _editingUserData;
-  bool _isConfirmingDelete = false; // New state for delete confirmation
-
-  final _editUserNameController = TextEditingController();
-  final _editUserLastNameController = TextEditingController();
-  final _editUserEmailController = TextEditingController();
-  final _editUserRoleController = TextEditingController();
-  final _editUserPositionController = TextEditingController();
-  final _editUserOrganizationController = TextEditingController();
-
   String _avatarUrl = '';
   late Language _selectedLanguage;
+  late Stream<QuerySnapshot> _usersStream;
 
   final _scrollController = ScrollController();
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   void initState() {
     super.initState();
+    _usersStream = FirebaseFirestore.instance.collection('users').snapshots();
     _loadProfileFromLocalStorage();
     _subscribeToProfileUpdates();
   }
@@ -116,12 +104,6 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
     _schoolAboutController.dispose();
     _schoolContactController.dispose();
     _schoolStudentsController.dispose();
-    _editUserNameController.dispose();
-    _editUserLastNameController.dispose();
-    _editUserEmailController.dispose();
-    _editUserRoleController.dispose();
-    _editUserPositionController.dispose();
-    _editUserOrganizationController.dispose();
     super.dispose();
   }
 
@@ -170,7 +152,6 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Add this line
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -196,7 +177,11 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                     children: [
                       _buildColumnWithTitle(l10n.profileTitle, _buildProfileCard(l10n), width: cardWidth),
                       _buildColumnWithTitle(l10n.schoolProfile, _buildSchoolCard(l10n), width: cardWidth),
-                      _buildColumnWithTitle(l10n.users, _buildUsersCard(l10n), width: cardWidth),
+                      _buildColumnWithTitle(
+                        l10n.users,
+                        _UsersCard(l10n: l10n, usersStream: _usersStream),
+                        width: cardWidth,
+                      ),
                     ],
                   );
                 },
@@ -355,119 +340,181 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
     );
   }
 
-  Widget _buildUsersCard(AppLocalizations l10n) {
-    return GlassmorphicContainer(
-        width: double.infinity,
-        height: 550,
-        borderRadius: 20,
-        blur: 15,
-        border: 0,
-        linearGradient: kGlassmorphicGradient,
-        borderGradient: kGlassmorphicBorderGradient,
-        child: Stack(children: [
-          Column(children: [
-            Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(children: [
-                  const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people, color: Colors.white)),
-                  const SizedBox(width: 15),
-                  Text(l10n.userList, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold))
-                ])),
-            Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance.collection('users').snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
-                      }
-                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return const Center(child: Text('No users found', style: const TextStyle(color: Colors.white)));
-                      }
-                      final users = snapshot.data!.docs;
-                      final userCount = users.length;
-                      return Column(children: [
-                        Expanded(
-                            child: ListView.separated(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                itemCount: userCount,
-                                separatorBuilder: (_, __) => const Divider(color: Colors.white10),
-                                itemBuilder: (context, index) {
-                                  final userDoc = users[index];
-                                  final user = userDoc.data() as Map<String, dynamic>;
-                                  final userId = userDoc.id;
-                                  final userName = user['name'] ?? 'N/A';
-                                  final userLastName = user['lastName'] ?? '';
-                                  final userEmail = user['email'] ?? '';
-                                  final avatarUrl = user['avatarUrl'] as String? ?? '';
-                                  return ListTile(
-                                      onTap: () {
-                                        setState(() {
-                                          _editingUserId = userId;
-                                          _editingUserData = user;
-                                          _editUserNameController.text = user['name'] ?? '';
-                                          _editUserLastNameController.text = user['lastName'] ?? '';
-                                          _editUserEmailController.text = user['email'] ?? '';
-                                          _editUserRoleController.text = user['role'] ?? '';
-                                          _editUserPositionController.text = user['position'] ?? '';
-                                          _editUserOrganizationController.text = user['organization'] ?? '';
-                                        });
-                                      },
-                                      contentPadding: EdgeInsets.zero,
-                                      leading: CircleAvatar(
-                                          radius: 20,
-                                          backgroundColor: Colors.white24,
-                                          backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                                          child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 20, color: Colors.white) : null),
-                                      title: Text('$userName $userLastName', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                                      subtitle: Text(userEmail, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                                      trailing: const Icon(Icons.chevron_right, color: Colors.white24));
-                                })),
-                        Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Text(l10n.totalUsers(userCount), style: const TextStyle(color: Colors.white70, fontSize: 12)))
-                      ]);
-                    }))
-          ]),
-          _buildEditUserPanel(l10n)
-        ]));
-  }
-
-  Widget _buildEditUserPanel(AppLocalizations l10n) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        final offsetAnimation = Tween<Offset>(
-          begin: const Offset(1.0, 0.0),
-          end: Offset.zero,
-        ).animate(animation);
-        return SlideTransition(
-          position: offsetAnimation,
-          child: child,
-        );
-      },
-      child: _editingUserId != null
-          ? GlassmorphicContainer(
-              key: ValueKey(_editingUserId), // Important for AnimatedSwitcher
-              width: double.infinity,
-              height: double.infinity,
-              borderRadius: 20,
-              blur: 15,
-              border: 0,
-              linearGradient: kGlassmorphicGradient,
-              borderGradient: kGlassmorphicBorderGradient,
-              child: _buildUserEditForm(l10n),
-            )
-          : const SizedBox.shrink(), // Render nothing when not editing
+  Widget _buildInfoRow(String title, String value, {int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+          Text(value.isEmpty ? '-' : value,
+              maxLines: maxLines,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 16)),
+          const Divider(color: Colors.white10),
+        ],
+      ),
     );
   }
 
-  Widget _buildUserEditForm(AppLocalizations l10n) {
+  Widget _buildTextField(TextEditingController controller, String label, {int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: TextField(
+        controller: controller,
+        maxLines: maxLines,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.white60),
+          enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+          focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+        ),
+      ),
+    );
+  }
+}
+
+class _UsersCard extends StatefulWidget {
+  final AppLocalizations l10n;
+  final Stream<QuerySnapshot> usersStream;
+
+  const _UsersCard({required this.l10n, required this.usersStream});
+
+  @override
+  State<_UsersCard> createState() => _UsersCardState();
+}
+
+class _UsersCardState extends State<_UsersCard> {
+  String? _editingUserId;
+  Map<String, dynamic>? _editingUserData;
+  bool _isConfirmingDelete = false;
+
+  final _editUserNameController = TextEditingController();
+  final _editUserLastNameController = TextEditingController();
+  final _editUserEmailController = TextEditingController();
+  final _editUserRoleController = TextEditingController();
+  final _editUserPositionController = TextEditingController();
+  final _editUserOrganizationController = TextEditingController();
+
+  @override
+  void dispose() {
+    _editUserNameController.dispose();
+    _editUserLastNameController.dispose();
+    _editUserEmailController.dispose();
+    _editUserRoleController.dispose();
+    _editUserPositionController.dispose();
+    _editUserOrganizationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassmorphicContainer(
+      width: double.infinity,
+      height: 550,
+      borderRadius: 20,
+      blur: 15,
+      border: 0,
+      linearGradient: kGlassmorphicGradient,
+      borderGradient: kGlassmorphicBorderGradient,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (child, animation) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        child: _editingUserId == null ? _buildUsersList() : _buildUserEditForm(),
+      ),
+    );
+  }
+
+  Widget _buildUsersList() {
+    return Column(
+      key: const ValueKey('userList'),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Row(children: [
+            const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people, color: Colors.white)),
+            const SizedBox(width: 15),
+            Text(widget.l10n.userList, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold))
+          ]),
+        ),
+        Expanded(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: widget.usersStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
+              }
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return Center(child: Text('No users found', style: const TextStyle(color: Colors.white)));
+              }
+              final users = snapshot.data!.docs;
+              final userCount = users.length;
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: userCount,
+                      separatorBuilder: (_, __) => const Divider(color: Colors.white10),
+                      itemBuilder: (context, index) {
+                        final userDoc = users[index];
+                        final user = userDoc.data() as Map<String, dynamic>;
+                        final userId = userDoc.id;
+                        final userName = user['name'] ?? 'N/A';
+                        final userLastName = user['lastName'] ?? '';
+                        final userEmail = user['email'] ?? '';
+                        final avatarUrl = user['avatarUrl'] as String? ?? '';
+                        return ListTile(
+                          onTap: () {
+                            setState(() {
+                              _editingUserId = userId;
+                              _editingUserData = user;
+                              _editUserNameController.text = user['name'] ?? '';
+                              _editUserLastNameController.text = user['lastName'] ?? '';
+                              _editUserEmailController.text = user['email'] ?? '';
+                              _editUserRoleController.text = user['role'] ?? '';
+                              _editUserPositionController.text = user['position'] ?? '';
+                              _editUserOrganizationController.text = user['organization'] ?? '';
+                            });
+                          },
+                          contentPadding: EdgeInsets.zero,
+                          leading: CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.white24,
+                              backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                              child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 20, color: Colors.white) : null),
+                          title: Text('$userName $userLastName', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                          subtitle: Text(userEmail, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                          trailing: const Icon(Icons.chevron_right, color: Colors.white24),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Text(widget.l10n.totalUsers(userCount), style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUserEditForm() {
+    final l10n = widget.l10n;
     final avatarUrl = _editingUserData?['avatarUrl'] as String? ?? '';
 
     return Scaffold(
+      key: const ValueKey('editUser'),
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -478,17 +525,17 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
             setState(() {
               _editingUserId = null;
               _editingUserData = null;
-              _isConfirmingDelete = false; // Reset delete confirmation state
+              _isConfirmingDelete = false;
             });
           },
         ),
         actions: [
-          if (!_isConfirmingDelete) // Show delete icon only when not confirming delete
+          if (!_isConfirmingDelete)
             IconButton(
               icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
               onPressed: () {
                 setState(() {
-                  _isConfirmingDelete = true; // Set state to show confirmation
+                  _isConfirmingDelete = true;
                 });
               },
             ),
@@ -512,7 +559,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                       TextButton(
                         onPressed: () {
                           setState(() {
-                            _isConfirmingDelete = false; // Cancel delete, go back to edit form
+                            _isConfirmingDelete = false;
                           });
                         },
                         child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),
@@ -521,12 +568,12 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                         onPressed: () {
                           FirebaseFirestore.instance.collection('users').doc(_editingUserId!).delete();
                           setState(() {
-                            _editingUserId = null; // Close edit panel
+                            _editingUserId = null;
                             _editingUserData = null;
-                            _isConfirmingDelete = false; // Reset delete confirmation state
+                            _isConfirmingDelete = false;
                           });
                         },
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent), // Highlight delete button
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
                         child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
                       ),
                     ],
@@ -583,23 +630,6 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                   )
                 ],
               ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String title, String value, {int maxLines = 1}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-          Text(value.isEmpty ? '-' : value,
-              maxLines: maxLines,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 16)),
-          const Divider(color: Colors.white10),
-        ],
       ),
     );
   }
