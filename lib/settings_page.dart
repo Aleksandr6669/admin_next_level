@@ -507,10 +507,10 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 50),
-                  const Text("Delete User", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                  Text(l10n.deleteUser, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
-                  const Text("Are you sure you want to delete this user? This action cannot be undone.",
-                      textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 16)),
+                  Text(l10n.deleteUserConfirmation,
+                      textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 16)),
                   const SizedBox(height: 40),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -533,7 +533,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                           });
                         },
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent), // Highlight delete button
-                        child: const Text("Delete", style: TextStyle(color: Colors.white)),
+                        child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
                       ),
                     ],
                   ),

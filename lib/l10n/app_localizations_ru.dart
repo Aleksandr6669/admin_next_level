@@ -300,4 +300,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get save => 'Сохранить';
+
+  @override
+  String get deleteUser => 'Удалить пользователя';
+
+  @override
+  String get deleteUserConfirmation =>
+      'Вы уверены, что хотите удалить этого пользователя? Это действие нельзя отменить.';
+
+  @override
+  String get delete => 'Удалить';
 }

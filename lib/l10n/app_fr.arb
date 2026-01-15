@@ -85,5 +85,8 @@
     "adminPanel": "Panneau d'administration",
     "searchHint": "Rechercher...",
     "schoolProfile": "Profil de l'école",
-    "users": "Utilisateurs"
+    "users": "Utilisateurs",
+    "deleteUser": "Supprimer l'utilisateur",
+    "deleteUserConfirmation": "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.",
+    "delete": "Supprimer"
 }

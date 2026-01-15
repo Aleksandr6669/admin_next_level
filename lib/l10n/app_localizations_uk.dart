@@ -300,4 +300,14 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get save => 'Зберегти';
+
+  @override
+  String get deleteUser => 'Видалити користувача';
+
+  @override
+  String get deleteUserConfirmation =>
+      'Ви впевнені, що хочете видалити цього користувача? Цю дію неможливо скасувати.';
+
+  @override
+  String get delete => 'Видалити';
 }

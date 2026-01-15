@@ -300,4 +300,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get save => 'Save';
+
+  @override
+  String get deleteUser => 'Supprimer l\'utilisateur';
+
+  @override
+  String get deleteUserConfirmation =>
+      'Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.';
+
+  @override
+  String get delete => 'Supprimer';
 }

@@ -294,4 +294,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get save => 'Save';
+
+  @override
+  String get deleteUser => 'Delete User';
+
+  @override
+  String get deleteUserConfirmation =>
+      'Are you sure you want to delete this user? This action cannot be undone.';
+
+  @override
+  String get delete => 'Delete';
 }
