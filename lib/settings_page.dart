@@ -41,6 +41,11 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   final _schoolContactController = TextEditingController(text: "info@nextlevel.com");
   final _schoolStudentsController = TextEditingController(text: "1500 students");
 
+  String? _editingUserId;
+  final _editUserNameController = TextEditingController();
+  final _editUserLastNameController = TextEditingController();
+  final _editUserEmailController = TextEditingController();
+
   String _avatarUrl = '';
   late Language _selectedLanguage;
 
@@ -102,6 +107,9 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
     _schoolAboutController.dispose();
     _schoolContactController.dispose();
     _schoolStudentsController.dispose();
+    _editUserNameController.dispose();
+    _editUserLastNameController.dispose();
+    _editUserEmailController.dispose();
     super.dispose();
   }
 
@@ -376,26 +384,71 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                   itemCount: users.length,
                   separatorBuilder: (_, __) => const Divider(color: Colors.white10),
                   itemBuilder: (context, index) {
-                    final user = users[index].data() as Map<String, dynamic>;
-                    final userName = user['name'] ?? 'N/A';
-                    final userLastName = user['lastName'] ?? '';
-                    final userEmail = user['email'] ?? '';
-                    final avatarUrl = user['avatarUrl'] as String? ?? '';
+                    final userDoc = users[index];
+                    final user = userDoc.data() as Map<String, dynamic>;
+                    final userId = userDoc.id;
 
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.white24,
-                        backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                        child: avatarUrl.isEmpty
-                            ? const Icon(Icons.person, size: 20, color: Colors.white)
-                            : null,
-                      ),
-                      title: Text('$userName $userLastName', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                      subtitle: Text(userEmail, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                      trailing: const Icon(Icons.chevron_right, color: Colors.white24),
-                    );
+                    if (_editingUserId == userId) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Column(
+                          children: [
+                            _buildTextField(_editUserNameController, l10n.firstName),
+                            _buildTextField(_editUserLastNameController, l10n.lastName),
+                            _buildTextField(_editUserEmailController, l10n.email),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                  onPressed: () => setState(() => _editingUserId = null),
+                                  child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    final updatedData = {
+                                      'name': _editUserNameController.text,
+                                      'lastName': _editUserLastNameController.text,
+                                      'email': _editUserEmailController.text,
+                                    };
+                                    FirebaseFirestore.instance.collection('users').doc(userId).update(updatedData);
+                                    setState(() => _editingUserId = null);
+                                  },
+                                  child: Text(l10n.save),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      );
+                    } else {
+                      final userName = user['name'] ?? 'N/A';
+                      final userLastName = user['lastName'] ?? '';
+                      final userEmail = user['email'] ?? '';
+                      final avatarUrl = user['avatarUrl'] as String? ?? '';
+
+                      return ListTile(
+                        onTap: () {
+                          setState(() {
+                            _editingUserId = userId;
+                            _editUserNameController.text = userName;
+                            _editUserLastNameController.text = userLastName;
+                            _editUserEmailController.text = userEmail;
+                          });
+                        },
+                        contentPadding: EdgeInsets.zero,
+                        leading: CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.white24,
+                          backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                          child: avatarUrl.isEmpty
+                              ? const Icon(Icons.person, size: 20, color: Colors.white)
+                              : null,
+                        ),
+                        title: Text('$userName $userLastName', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                        subtitle: Text(userEmail, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                        trailing: const Icon(Icons.chevron_right, color: Colors.white24),
+                      );
+                    }
                   },
                 );
               },
