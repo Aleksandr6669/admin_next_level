@@ -386,7 +386,7 @@ class _HomePageState extends State<HomePage> {
               child: ListTile(
                 leading: const Icon(Icons.logout, color: kBottomNavUnselectedItemColor),
                 title: _isExpanded
-                    ? Text(l10n.logout, style: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 14))
+                    ? Text(l10n.logout, style: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis,)
                     : const SizedBox.shrink(),
                 onTap: _logout,
               ),
