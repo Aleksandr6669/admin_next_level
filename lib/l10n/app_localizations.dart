@@ -246,6 +246,12 @@ abstract class AppLocalizations {
   /// **'Progress'**
   String get bottomNavProgress;
 
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
   /// No description provided for @enterVerificationCode.
   ///
   /// In en, this message translates to:

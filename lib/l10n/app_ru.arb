@@ -24,6 +24,7 @@
     "bottomNavCourses": "Курсы",
     "bottomNavTests": "Тесты",
     "bottomNavProgress": "Прогресс",
+    "logout": "Выход",
     "enterVerificationCode": "Введите код подтверждения",
     "verificationCodeSent": "Код подтверждения отправлен на вашу электронную почту.",
     "verificationCode": "Код подтверждения",

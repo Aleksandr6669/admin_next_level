@@ -83,6 +83,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get bottomNavProgress => 'Progrès';
 
   @override
+  String get logout => 'Déconnexion';
+
+  @override
   String get enterVerificationCode => 'Entrez le code de vérification';
 
   @override

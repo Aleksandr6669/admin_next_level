@@ -81,6 +81,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bottomNavProgress => 'Progress';
 
   @override
+  String get logout => 'Logout';
+
+  @override
   String get enterVerificationCode => 'Enter Verification Code';
 
   @override

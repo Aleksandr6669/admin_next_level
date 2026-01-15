@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
+import 'package:nextlevel/parallax_background.dart';
 import 'l10n/app_localizations.dart';
 import 'models/language.dart';
 import 'styles.dart';
@@ -210,31 +211,27 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: kBackgroundDecoration, // Using style from styles.dart
-          ),
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: GlassmorphicAuthForm(
-                formKey: _formKey,
-                emailController: _emailController,
-                passwordController: _passwordController,
-                confirmPasswordController: _confirmPasswordController,
-                changeLanguage: widget.changeLanguage,
-                isLogin: _isLogin,
-                isForgotPassword: _isForgotPassword,
-                isLoading: _isLoading,
-                onToggleFormType: _toggleFormType,
-                onToggleForgotPassword: _toggleForgotPassword,
-                handleAuthAction: _handleAuthAction,
-                handleForgotPasswordAction: _handleForgotPasswordAction,
-              ),
+      body: ParallaxBackground(
+        backgroundImage: 'assets/background.jpg',
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: GlassmorphicAuthForm(
+              formKey: _formKey,
+              emailController: _emailController,
+              passwordController: _passwordController,
+              confirmPasswordController: _confirmPasswordController,
+              changeLanguage: widget.changeLanguage,
+              isLogin: _isLogin,
+              isForgotPassword: _isForgotPassword,
+              isLoading: _isLoading,
+              onToggleFormType: _toggleFormType,
+              onToggleForgotPassword: _toggleForgotPassword,
+              handleAuthAction: _handleAuthAction,
+              handleForgotPasswordAction: _handleForgotPasswordAction,
             ),
           ),
-        ],
+        ),
       ),
     );
   }

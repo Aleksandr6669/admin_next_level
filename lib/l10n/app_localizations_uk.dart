@@ -83,6 +83,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get bottomNavProgress => 'Прогрес';
 
   @override
+  String get logout => 'Вихід';
+
+  @override
   String get enterVerificationCode => 'Введіть код підтвердження';
 
   @override

@@ -83,6 +83,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get bottomNavProgress => 'Прогресс';
 
   @override
+  String get logout => 'Выход';
+
+  @override
   String get enterVerificationCode => 'Введите код подтверждения';
 
   @override

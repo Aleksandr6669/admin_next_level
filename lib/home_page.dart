@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nextlevel/courses_page.dart';
 import 'package:nextlevel/feed_page.dart';
+import 'package:nextlevel/parallax_background.dart';
 import 'package:nextlevel/progress_page.dart';
 import 'package:nextlevel/settings_page.dart';
 import 'package:nextlevel/tests_page.dart';
@@ -154,6 +155,10 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _logout() async {
+    await auth.FirebaseAuth.instance.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     final navItems = _getNavItems(context);
@@ -189,33 +194,29 @@ class _HomePageState extends State<HomePage> {
             }
             final user = snapshot.data ?? AppUser(name: 'Loading...', role: '');
 
-            return Stack(
-              children: [
-                Container(
-                  decoration: kBackgroundDecoration,
-                ),
-                Column(
-                  children: [
-                    _buildHeader(context, user),
-                    Expanded(
-                      child: Row(
-                        children: <Widget>[
-                          _buildGlassmorphicSideNavBar(
-                              context, navItems, navBarIndex),
-                          const VerticalDivider(thickness: 1, width: 1),
-                          Expanded(
-                            child: IndexedStack(
-                              index: _widgetIndex,
-                              children: widgetOptions,
-                            ),
+            return ParallaxBackground(
+              backgroundImage: 'assets/background.jpg',
+              child: Column(
+                children: [
+                  _buildHeader(context, user),
+                  Expanded(
+                    child: Row(
+                      children: <Widget>[
+                        _buildGlassmorphicSideNavBar(
+                            context, navItems, navBarIndex),
+                        const VerticalDivider(thickness: 1, width: 1),
+                        Expanded(
+                          child: IndexedStack(
+                            index: _widgetIndex,
+                            children: widgetOptions,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    _buildFooter(context),
-                  ],
-                ),
-              ],
+                  ),
+                  _buildFooter(context),
+                ],
+              ),
             );
           }),
     );
@@ -307,7 +308,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildFooter(BuildContext context) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 30,
+      height: 50,
       borderRadius: 0,
       blur: 7,
       alignment: Alignment.center,
@@ -317,7 +318,7 @@ class _HomePageState extends State<HomePage> {
       child: Center(
         child: Text(
           'Next Level © 2024',
-          style: kSubtitleTextStyle.copyWith(fontSize: 10, color: Colors.white54),
+          style: kSubtitleTextStyle.copyWith(fontSize: 16, color: Colors.white54),
         ),
       ),
     );
@@ -340,22 +341,43 @@ class _HomePageState extends State<HomePage> {
         ),
         SizedBox(
           width: 200,
-          child: NavigationRail(
-            extended: true,
-            selectedIndex: navBarIndex,
-            onDestinationSelected: _onItemTapped,
-            backgroundColor: Colors.transparent,
-            indicatorColor: kBottomNavSelectedItemColor.withOpacity(0.2),
-            selectedIconTheme: const IconThemeData(color: kBottomNavSelectedItemColor, size: 30),
-            unselectedIconTheme: const IconThemeData(color: kBottomNavUnselectedItemColor, size: 30),
-            selectedLabelTextStyle: const TextStyle(color: kBottomNavSelectedItemColor, fontSize: 14),
-            unselectedLabelTextStyle: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 14),
-            destinations: navItems.map((item) {
-              return NavigationRailDestination(
-                icon: Icon(item['icon']),
-                label: Text(item['label']),
-              );
-            }).toList(),
+          child: Column(
+            children: [
+              Expanded(
+                child: NavigationRail(
+                  extended: true,
+                  selectedIndex: navBarIndex,
+                  onDestinationSelected: _onItemTapped,
+                  backgroundColor: Colors.transparent,
+                  indicatorColor: kBottomNavSelectedItemColor.withOpacity(0.2),
+                  selectedIconTheme: const IconThemeData(color: kBottomNavSelectedItemColor, size: 30),
+                  unselectedIconTheme: const IconThemeData(color: kBottomNavUnselectedItemColor, size: 30),
+                  selectedLabelTextStyle: const TextStyle(color: kBottomNavSelectedItemColor, fontSize: 14),
+                  unselectedLabelTextStyle: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 14),
+                  destinations: navItems.map((item) {
+                    return NavigationRailDestination(
+                      icon: Icon(item['icon']),
+                      label: Text(item['label']),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: kBottomNavUnselectedItemColor.withOpacity(0.5)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(Icons.logout, color: kBottomNavUnselectedItemColor),
+                    title: Text(l10n.logout, style: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 14)),
+                    onTap: _logout,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ],

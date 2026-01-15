@@ -24,6 +24,7 @@
     "bottomNavCourses": "Courses",
     "bottomNavTests": "Tests",
     "bottomNavProgress": "Progress",
+    "logout": "Logout",
     "enterVerificationCode": "Enter Verification Code",
     "verificationCodeSent": "A verification code has been sent to your email.",
     "verificationCode": "Verification Code",
