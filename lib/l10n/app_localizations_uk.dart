@@ -310,4 +310,9 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get delete => 'Видалити';
+
+  @override
+  String totalUsers(int count) {
+    return 'Всього користувачів: $count';
+  }
 }

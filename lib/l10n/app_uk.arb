@@ -108,5 +108,13 @@
     "save": "Зберегти",
     "deleteUser": "Видалити користувача",
     "deleteUserConfirmation": "Ви впевнені, що хочете видалити цього користувача? Цю дію неможливо скасувати.",
-    "delete": "Видалити"
+    "delete": "Видалити",
+    "totalUsers": "Всього користувачів: {count}",
+    "@totalUsers": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    }
 }

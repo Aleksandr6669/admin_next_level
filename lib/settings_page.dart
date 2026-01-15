@@ -353,92 +353,82 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
 
   Widget _buildUsersCard(AppLocalizations l10n) {
     return GlassmorphicContainer(
-      width: double.infinity,
-      height: 550,
-      borderRadius: 20,
-      blur: 15,
-      border: 0,
-      linearGradient: kGlassmorphicGradient,
-      borderGradient: kGlassmorphicBorderGradient,
-      child: Stack(
-        children: [
-          // User list
-          Column(
-            children: [
-              Padding(
+        width: double.infinity,
+        height: 550,
+        borderRadius: 20,
+        blur: 15,
+        border: 0,
+        linearGradient: kGlassmorphicGradient,
+        borderGradient: kGlassmorphicBorderGradient,
+        child: Stack(children: [
+          Column(children: [
+            Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  children: [
-                    const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people, color: Colors.white)),
-                    const SizedBox(width: 15),
-                    Text(l10n.userList, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-              Expanded(
+                child: Row(children: [
+                  const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people, color: Colors.white)),
+                  const SizedBox(width: 15),
+                  Text(l10n.userList, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold))
+                ])),
+            Expanded(
                 child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance.collection('users').snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
-                    }
-                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return const Center(child: Text('No users found', style: const TextStyle(color: Colors.white)));
-                    }
-
-                    final users = snapshot.data!.docs;
-
-                    return ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: users.length,
-                      separatorBuilder: (_, __) => const Divider(color: Colors.white10),
-                      itemBuilder: (context, index) {
-                        final userDoc = users[index];
-                        final user = userDoc.data() as Map<String, dynamic>;
-                        final userId = userDoc.id;
-                        final userName = user['name'] ?? 'N/A';
-                        final userLastName = user['lastName'] ?? '';
-                        final userEmail = user['email'] ?? '';
-                        final avatarUrl = user['avatarUrl'] as String? ?? '';
-
-                        return ListTile(
-                          onTap: () {
-                            setState(() {
-                              _editingUserId = userId;
-                              _editingUserData = user;
-                              _editUserNameController.text = user['name'] ?? '';
-                              _editUserLastNameController.text = user['lastName'] ?? '';
-                              _editUserEmailController.text = user['email'] ?? '';
-                              _editUserRoleController.text = user['role'] ?? '';
-                              _editUserPositionController.text = user['position'] ?? '';
-                              _editUserOrganizationController.text = user['organization'] ?? '';
-                            });
-                          },
-                          contentPadding: EdgeInsets.zero,
-                          leading: CircleAvatar(
-                            radius: 20,
-                            backgroundColor: Colors.white24,
-                            backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                            child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 20, color: Colors.white) : null,
-                          ),
-                          title: Text('$userName $userLastName', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                          subtitle: Text(userEmail, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                          trailing: const Icon(Icons.chevron_right, color: Colors.white24),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          _buildEditUserPanel(l10n),
-        ],
-      ),
-    );
+                    stream: FirebaseFirestore.instance.collection('users').snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
+                      }
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return const Center(child: Text('No users found', style: const TextStyle(color: Colors.white)));
+                      }
+                      final users = snapshot.data!.docs;
+                      final userCount = users.length;
+                      return Column(children: [
+                        Expanded(
+                            child: ListView.separated(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                itemCount: userCount,
+                                separatorBuilder: (_, __) => const Divider(color: Colors.white10),
+                                itemBuilder: (context, index) {
+                                  final userDoc = users[index];
+                                  final user = userDoc.data() as Map<String, dynamic>;
+                                  final userId = userDoc.id;
+                                  final userName = user['name'] ?? 'N/A';
+                                  final userLastName = user['lastName'] ?? '';
+                                  final userEmail = user['email'] ?? '';
+                                  final avatarUrl = user['avatarUrl'] as String? ?? '';
+                                  return ListTile(
+                                      onTap: () {
+                                        setState(() {
+                                          _editingUserId = userId;
+                                          _editingUserData = user;
+                                          _editUserNameController.text = user['name'] ?? '';
+                                          _editUserLastNameController.text = user['lastName'] ?? '';
+                                          _editUserEmailController.text = user['email'] ?? '';
+                                          _editUserRoleController.text = user['role'] ?? '';
+                                          _editUserPositionController.text = user['position'] ?? '';
+                                          _editUserOrganizationController.text = user['organization'] ?? '';
+                                        });
+                                      },
+                                      contentPadding: EdgeInsets.zero,
+                                      leading: CircleAvatar(
+                                          radius: 20,
+                                          backgroundColor: Colors.white24,
+                                          backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                                          child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 20, color: Colors.white) : null),
+                                      title: Text('$userName $userLastName', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                                      subtitle: Text(userEmail, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                                      trailing: const Icon(Icons.chevron_right, color: Colors.white24));
+                                })),
+                        Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Text(l10n.totalUsers(userCount), style: const TextStyle(color: Colors.white70, fontSize: 12)))
+                      ]);
+                    }))
+          ]),
+          _buildEditUserPanel(l10n)
+        ]));
   }
 
   Widget _buildEditUserPanel(AppLocalizations l10n) {

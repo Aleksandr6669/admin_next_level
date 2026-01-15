@@ -304,4 +304,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get delete => 'Delete';
+
+  @override
+  String totalUsers(int count) {
+    return 'Total Users: $count';
+  }
 }

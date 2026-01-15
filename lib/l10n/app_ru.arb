@@ -109,5 +109,13 @@
     "save": "Сохранить",
     "deleteUser": "Удалить пользователя",
     "deleteUserConfirmation": "Вы уверены, что хотите удалить этого пользователя? Это действие нельзя отменить.",
-    "delete": "Удалить"
+    "delete": "Удалить",
+    "totalUsers": "Всего пользователей: {count}",
+    "@totalUsers": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    }
 }
