@@ -171,7 +171,7 @@ class _LiquidNavBarState extends State<LiquidNavBar> with TickerProviderStateMix
                       if (widget.extended) const SizedBox(width: 20),
                       Icon(
                         item['icon'] as IconData,
-                        size: 28,
+                        size: 26,
                         color: isSelected
                             ? widget.selectedItemColor
                             : widget.unselectedItemColor,
@@ -185,7 +185,7 @@ class _LiquidNavBarState extends State<LiquidNavBar> with TickerProviderStateMix
                               color: isSelected
                                   ? widget.selectedItemColor
                                   : widget.unselectedItemColor,
-                              fontSize: 14,
+                              fontSize: 12,
                               fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.normal,
