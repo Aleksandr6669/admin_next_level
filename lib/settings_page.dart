@@ -43,6 +43,8 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
 
   String? _editingUserId;
   Map<String, dynamic>? _editingUserData;
+  bool _isConfirmingDelete = false; // New state for delete confirmation
+
   final _editUserNameController = TextEditingController();
   final _editUserLastNameController = TextEditingController();
   final _editUserEmailController = TextEditingController();
@@ -482,100 +484,111 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
             setState(() {
               _editingUserId = null;
               _editingUserData = null;
+              _isConfirmingDelete = false; // Reset delete confirmation state
             });
           },
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-            onPressed: () => _confirmDeleteUser(context, l10n, _editingUserId!),
-          ),
+          if (!_isConfirmingDelete) // Show delete icon only when not confirming delete
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+              onPressed: () {
+                setState(() {
+                  _isConfirmingDelete = true; // Set state to show confirmation
+                });
+              },
+            ),
         ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-        child: Column(
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-              child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 50) : null,
-            ),
-            const SizedBox(height: 20),
-            _buildTextField(_editUserNameController, l10n.firstName),
-            _buildTextField(_editUserLastNameController, l10n.lastName),
-            _buildTextField(_editUserEmailController, l10n.email),
-            _buildTextField(_editUserRoleController, l10n.role),
-            _buildTextField(_editUserPositionController, l10n.position),
-            _buildTextField(_editUserOrganizationController, l10n.organization),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _editingUserId = null;
-                      _editingUserData = null;
-                    });
-                  },
-                  child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    final updatedData = {
-                      'name': _editUserNameController.text,
-                      'lastName': _editUserLastNameController.text,
-                      'email': _editUserEmailController.text,
-                      'role': _editUserRoleController.text,
-                      'position': _editUserPositionController.text,
-                      'organization': _editUserOrganizationController.text,
-                    };
-                    FirebaseFirestore.instance.collection('users').doc(_editingUserId!).update(updatedData);
-                    setState(() {
-                      _editingUserId = null;
-                      _editingUserData = null;
-                    });
-                  },
-                  child: Text(l10n.save),
-                ),
-              ],
-            )
-          ],
-        ),
+        child: _isConfirmingDelete
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 50),
+                  const Text("Delete User", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 20),
+                  const Text("Are you sure you want to delete this user? This action cannot be undone.",
+                      textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 16)),
+                  const SizedBox(height: 40),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmingDelete = false; // Cancel delete, go back to edit form
+                          });
+                        },
+                        child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          FirebaseFirestore.instance.collection('users').doc(_editingUserId!).delete();
+                          setState(() {
+                            _editingUserId = null; // Close edit panel
+                            _editingUserData = null;
+                            _isConfirmingDelete = false; // Reset delete confirmation state
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent), // Highlight delete button
+                        child: const Text("Delete", style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            : Column(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                    child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 50) : null,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextField(_editUserNameController, l10n.firstName),
+                  _buildTextField(_editUserLastNameController, l10n.lastName),
+                  _buildTextField(_editUserEmailController, l10n.email),
+                  _buildTextField(_editUserRoleController, l10n.role),
+                  _buildTextField(_editUserPositionController, l10n.position),
+                  _buildTextField(_editUserOrganizationController, l10n.organization),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _editingUserId = null;
+                            _editingUserData = null;
+                          });
+                        },
+                        child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          final updatedData = {
+                            'name': _editUserNameController.text,
+                            'lastName': _editUserLastNameController.text,
+                            'email': _editUserEmailController.text,
+                            'role': _editUserRoleController.text,
+                            'position': _editUserPositionController.text,
+                            'organization': _editUserOrganizationController.text,
+                          };
+                          FirebaseFirestore.instance.collection('users').doc(_editingUserId!).update(updatedData);
+                          setState(() {
+                            _editingUserId = null;
+                            _editingUserData = null;
+                          });
+                        },
+                        child: Text(l10n.save),
+                      ),
+                    ],
+                  )
+                ],
+              ),
       ),
-    );
-  }
-
-  Future<void> _confirmDeleteUser(BuildContext context, AppLocalizations l10n, String userId) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF2c2c2c),
-          title: const Text("Delete User", style: TextStyle(color: Colors.white)),
-          content: const Text("Are you sure you want to delete this user?", style: TextStyle(color: Colors.white70)),
-          actions: <Widget>[
-            TextButton(
-              child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text("Delete", style: TextStyle(color: Colors.redAccent)),
-              onPressed: () {
-                FirebaseFirestore.instance.collection('users').doc(userId).delete();
-                Navigator.of(context).pop(); // Close the confirmation dialog
-                setState(() {
-                  _editingUserId = null; // Close the edit panel
-                  _editingUserData = null;
-                });
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
