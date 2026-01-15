@@ -269,7 +269,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TextButton(onPressed: () => setState(() => _isProfileEditing = false), child: Text(l10n.cancel)),
+                  TextButton(onPressed: () => setState(() => _isProfileEditing = false), child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),),
                   ElevatedButton(onPressed: _updateProfile, child: Text(l10n.saveChanges)),
                 ],
               )
@@ -329,7 +329,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TextButton(onPressed: () => setState(() => _isSchoolEditing = false), child: Text(l10n.cancel)),
+                  TextButton(onPressed: () => setState(() => _isSchoolEditing = false), child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),),
                   ElevatedButton(onPressed: () => setState(() => _isSchoolEditing = false), child: Text(l10n.saveChanges)),
                 ],
               )
