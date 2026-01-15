@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nextlevel/l10n/app_localizations.dart';
 import 'package:nextlevel/profile_service.dart';
@@ -334,7 +335,6 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   }
 
   Widget _buildUsersCard(AppLocalizations l10n) {
-    final mockUsers = ["Иван Петров", "Мария Сидорова", "Алексей Ковалев", "Елена Смирнова", "Сергей Новиков", "Андрей Федоров", "Юлия Котова"];
     return GlassmorphicContainer(
       width: double.infinity,
       height: 550,
@@ -356,16 +356,49 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
             ),
           ),
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: mockUsers.length,
-              separatorBuilder: (_, __) => const Divider(color: Colors.white10),
-              itemBuilder: (context, index) => ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const CircleAvatar(radius: 15, backgroundColor: Colors.white24, child: Icon(Icons.person, size: 15, color: Colors.white)),
-                title: Text(mockUsers[index], style: const TextStyle(color: Colors.white, fontSize: 14)),
-                trailing: const Icon(Icons.chevron_right, color: Colors.white24),
-              ),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance.collection('users').snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text('No users found', style: const TextStyle(color: Colors.white)));
+                }
+
+                final users = snapshot.data!.docs;
+
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: users.length,
+                  separatorBuilder: (_, __) => const Divider(color: Colors.white10),
+                  itemBuilder: (context, index) {
+                    final user = users[index].data() as Map<String, dynamic>;
+                    final userName = user['name'] ?? 'N/A';
+                    final userLastName = user['lastName'] ?? '';
+                    final userEmail = user['email'] ?? '';
+                    final avatarUrl = user['avatarUrl'] as String? ?? '';
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.white24,
+                        backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                        child: avatarUrl.isEmpty
+                            ? const Icon(Icons.person, size: 20, color: Colors.white)
+                            : null,
+                      ),
+                      title: Text('$userName $userLastName', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                      subtitle: Text(userEmail, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.white24),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
