@@ -350,10 +350,10 @@ class _HomePageState extends State<HomePage> {
                   onDestinationSelected: _onItemTapped,
                   backgroundColor: Colors.transparent,
                   indicatorColor: kBottomNavSelectedItemColor.withOpacity(0.2),
-                  selectedIconTheme: const IconThemeData(color: kBottomNavSelectedItemColor, size: 30),
-                  unselectedIconTheme: const IconThemeData(color: kBottomNavUnselectedItemColor, size: 30),
+                  selectedIconTheme: const IconThemeData(color: kBottomNavSelectedItemColor, size: 25),
+                  unselectedIconTheme: const IconThemeData(color: kBottomNavUnselectedItemColor, size: 23),
                   selectedLabelTextStyle: const TextStyle(color: kBottomNavSelectedItemColor, fontSize: 14),
-                  unselectedLabelTextStyle: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 14),
+                  unselectedLabelTextStyle: const TextStyle(color: kBottomNavUnselectedItemColor, fontSize: 12),
                   destinations: navItems.map((item) {
                     return NavigationRailDestination(
                       icon: Icon(item['icon']),

@@ -219,7 +219,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
       height: 550,
       borderRadius: 20,
       blur: 15,
-      border: 1,
+      border: 0,
       linearGradient: kGlassmorphicGradient,
       borderGradient: kGlassmorphicBorderGradient,
       child: Padding(
@@ -279,7 +279,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
       height: 550,
       borderRadius: 20,
       blur: 15,
-      border: 1,
+      border: 0,
       linearGradient: kGlassmorphicGradient,
       borderGradient: kGlassmorphicBorderGradient,
       child: Padding(
@@ -340,7 +340,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
       height: 550,
       borderRadius: 20,
       blur: 15,
-      border: 1,
+      border: 0,
       linearGradient: kGlassmorphicGradient,
       borderGradient: kGlassmorphicBorderGradient,
       child: Column(
