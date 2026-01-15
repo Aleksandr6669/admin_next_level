@@ -97,5 +97,13 @@
     "users": "Користувачі",
     "tooltipCollapse": "Згорнути",
     "tooltipExpand": "Розгорнути",
-    "accessDeniedNotAdmin": "Доступ заборонено. Вхід тільки для адміністраторів."
+    "accessDeniedNotAdmin": "Доступ заборонено. Вхід тільки для адміністраторів.",
+    "schoolInfo": "Інформація про школу",
+    "editSchool": "Редагувати школу",
+    "userList": "Список користувачів",
+    "about": "Про нас",
+    "contact": "Контакт",
+    "students": "Студенти",
+    "schoolName": "Назва школи",
+    "save": "Зберегти"
 }

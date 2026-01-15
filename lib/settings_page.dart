@@ -262,7 +262,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TextButton(onPressed: () => setState(() => _isProfileEditing = false), child: const Text("Cancel")),
+                  TextButton(onPressed: () => setState(() => _isProfileEditing = false), child: Text(l10n.cancel)),
                   ElevatedButton(onPressed: _updateProfile, child: Text(l10n.saveChanges)),
                 ],
               )
@@ -287,24 +287,24 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.school, color: Colors.white)),
-                SizedBox(width: 15),
-                Text("School Info", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.school, color: Colors.white)),
+                const SizedBox(width: 15),
+                Text(l10n.schoolInfo, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
             const SizedBox(height: 20),
             if (!_isSchoolEditing) ...[
-              _buildInfoRow("Name", _schoolNameController.text),
-              _buildInfoRow("About", _schoolAboutController.text),
-              _buildInfoRow("Contact", _schoolContactController.text),
-              _buildInfoRow("Students", _schoolStudentsController.text),
+              _buildInfoRow(l10n.schoolName, _schoolNameController.text),
+              _buildInfoRow(l10n.about, _schoolAboutController.text),
+              _buildInfoRow(l10n.contact, _schoolContactController.text),
+              _buildInfoRow(l10n.students, _schoolStudentsController.text),
               const Spacer(),
               Center(
                 child: TextButton.icon(
                   icon: const Icon(Icons.edit, size: 16, color: Colors.blueAccent),
-                  label: const Text("Edit School", style: TextStyle(color: Colors.blueAccent)),
+                  label: Text(l10n.editSchool, style: const TextStyle(color: Colors.blueAccent)),
                   onPressed: () => setState(() => _isSchoolEditing = true),
                 ),
               ),
@@ -312,18 +312,18 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
               Expanded(
                 child: ListView(
                   children: [
-                    _buildTextField(_schoolNameController, "Name"),
-                    _buildTextField(_schoolAboutController, "About"),
-                    _buildTextField(_schoolContactController, "Contact"),
-                    _buildTextField(_schoolStudentsController, "Students"),
+                    _buildTextField(_schoolNameController, l10n.schoolName),
+                    _buildTextField(_schoolAboutController, l10n.about),
+                    _buildTextField(_schoolContactController, l10n.contact),
+                    _buildTextField(_schoolStudentsController, l10n.students),
                   ],
                 ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TextButton(onPressed: () => setState(() => _isSchoolEditing = false), child: const Text("Cancel")),
-                  ElevatedButton(onPressed: () => setState(() => _isSchoolEditing = false), child: const Text("Save")),
+                  TextButton(onPressed: () => setState(() => _isSchoolEditing = false), child: Text(l10n.cancel)),
+                  ElevatedButton(onPressed: () => setState(() => _isSchoolEditing = false), child: Text(l10n.saveChanges)),
                 ],
               )
             ],
@@ -345,13 +345,13 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
       borderGradient: kGlassmorphicBorderGradient,
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20.0),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
             child: Row(
               children: [
-                CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people, color: Colors.white)),
-                SizedBox(width: 15),
-                Text("User List", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people, color: Colors.white)),
+                const SizedBox(width: 15),
+                Text(l10n.userList, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
           ),

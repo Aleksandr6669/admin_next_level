@@ -4,6 +4,14 @@
     "gender",
     "tooltipCollapse",
     "tooltipExpand",
-    "accessDeniedNotAdmin"
+    "accessDeniedNotAdmin",
+    "schoolInfo",
+    "editSchool",
+    "userList",
+    "about",
+    "contact",
+    "students",
+    "schoolName",
+    "save"
   ]
 }

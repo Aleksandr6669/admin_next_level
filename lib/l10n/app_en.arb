@@ -97,5 +97,13 @@
     "users": "Users",
     "tooltipCollapse": "Collapse",
     "tooltipExpand": "Expand",
-    "accessDeniedNotAdmin": "Access denied. Only admins can log in."
+    "accessDeniedNotAdmin": "Access denied. Only admins can log in.",
+    "schoolInfo": "School Info",
+    "editSchool": "Edit School",
+    "userList": "User List",
+    "about": "About",
+    "contact": "Contact",
+    "students": "Students",
+    "schoolName": "School Name",
+    "save": "Save"
 }

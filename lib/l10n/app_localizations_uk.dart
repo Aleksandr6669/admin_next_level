@@ -276,4 +276,28 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get accessDeniedNotAdmin =>
       'Доступ заборонено. Вхід тільки для адміністраторів.';
+
+  @override
+  String get schoolInfo => 'Інформація про школу';
+
+  @override
+  String get editSchool => 'Редагувати школу';
+
+  @override
+  String get userList => 'Список користувачів';
+
+  @override
+  String get about => 'Про нас';
+
+  @override
+  String get contact => 'Контакт';
+
+  @override
+  String get students => 'Студенти';
+
+  @override
+  String get schoolName => 'Назва школи';
+
+  @override
+  String get save => 'Зберегти';
 }

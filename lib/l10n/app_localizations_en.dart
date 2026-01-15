@@ -270,4 +270,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accessDeniedNotAdmin => 'Access denied. Only admins can log in.';
+
+  @override
+  String get schoolInfo => 'School Info';
+
+  @override
+  String get editSchool => 'Edit School';
+
+  @override
+  String get userList => 'User List';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String get students => 'Students';
+
+  @override
+  String get schoolName => 'School Name';
+
+  @override
+  String get save => 'Save';
 }

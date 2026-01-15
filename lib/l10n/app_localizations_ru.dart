@@ -276,4 +276,28 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get accessDeniedNotAdmin =>
       'Доступ запрещен. Вход только для администраторов.';
+
+  @override
+  String get schoolInfo => 'Информация о школе';
+
+  @override
+  String get editSchool => 'Редактировать школу';
+
+  @override
+  String get userList => 'Список пользователей';
+
+  @override
+  String get about => 'О нас';
+
+  @override
+  String get contact => 'Контакт';
+
+  @override
+  String get students => 'Студенты';
+
+  @override
+  String get schoolName => 'Название школы';
+
+  @override
+  String get save => 'Сохранить';
 }

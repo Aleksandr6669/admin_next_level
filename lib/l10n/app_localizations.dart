@@ -605,6 +605,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Access denied. Only admins can log in.'**
   String get accessDeniedNotAdmin;
+
+  /// No description provided for @schoolInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'School Info'**
+  String get schoolInfo;
+
+  /// No description provided for @editSchool.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit School'**
+  String get editSchool;
+
+  /// No description provided for @userList.
+  ///
+  /// In en, this message translates to:
+  /// **'User List'**
+  String get userList;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get contact;
+
+  /// No description provided for @students.
+  ///
+  /// In en, this message translates to:
+  /// **'Students'**
+  String get students;
+
+  /// No description provided for @schoolName.
+  ///
+  /// In en, this message translates to:
+  /// **'School Name'**
+  String get schoolName;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
 }
 
 class _AppLocalizationsDelegate
