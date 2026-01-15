@@ -81,7 +81,7 @@ class _LiquidNavBarState extends State<LiquidNavBar> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: widget.direction == Axis.vertical ? (widget.extended ? 180 : 72) : double.infinity,
+      width: widget.direction == Axis.vertical ? (widget.extended ? 190 : 72) : double.infinity,
       height: widget.direction == Axis.horizontal ? 70 : double.infinity,
       child: AnimatedBuilder(
         animation: Listenable.merge([_animationController, _scaleController]),
@@ -123,11 +123,14 @@ class _LiquidNavBarState extends State<LiquidNavBar> with TickerProviderStateMix
       
       Widget content = InkWell(
           onTap: () {
-            setState(() {
-              _tappedIndex = index;
-            });
-            widget.onTap(index);
-            _scaleController.forward(from: 0.0);
+            // Не запускаем анимацию, если выбран тот же элемент
+            if(widget.selectedIndex != index) {
+                setState(() {
+                  _tappedIndex = index;
+                });
+                widget.onTap(index);
+                _scaleController.forward(from: 0.0);
+            }
           },
           borderRadius: BorderRadius.circular(30),
           child: ScaleTransition(

@@ -9,9 +9,10 @@ import 'styles.dart';
 import 'language_selector.dart';
 
 class AuthPage extends StatefulWidget {
-  const AuthPage({super.key, required this.changeLanguage});
+  const AuthPage({super.key, required this.changeLanguage, this.initialErrorMessage});
 
   final void Function(Locale locale) changeLanguage;
+  final String? initialErrorMessage;
 
   @override
   State<AuthPage> createState() => _AuthPageState();
@@ -26,6 +27,18 @@ class _AuthPageState extends State<AuthPage> {
   bool _isLogin = true;
   bool _isLoading = false;
   bool _isForgotPassword = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialErrorMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _showErrorSnackBar(context, widget.initialErrorMessage!);
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -80,25 +93,27 @@ class _AuthPageState extends State<AuthPage> {
             password: _passwordController.text,
           );
 
-          final userDoc = await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).get();
-          final userRole = userDoc.data()?['role'];
-
-          if (userRole != 'Admin') {
+          // Check for admin privileges in the 'admins' collection
+          final adminDoc = await FirebaseFirestore.instance.collection('admins').doc(userCredential.user!.uid).get();
+          
+          if (!adminDoc.exists) {
+            // If not an admin, sign out and throw an error
             await FirebaseAuth.instance.signOut();
             throw FirebaseAuthException(code: 'admin-only-access');
           } else {
+            // If user is an admin, update their last login date in the 'users' collection
              await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).update({
               'lastLoginDate': Timestamp.now(),
             });
           }
         } else {
-          // Create user
+          // Registration: Create user
           UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: _emailController.text,
             password: _passwordController.text,
           );
           final now = Timestamp.now();
-          // Create a user document in Firestore
+          // Create a user document in the 'users' collection (NOT 'admins')
           await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
             'email': _emailController.text,
             'createdAt': now,
@@ -110,7 +125,7 @@ class _AuthPageState extends State<AuthPage> {
             'phoneNumber': '',
             'gender': '',
             'birthDate': '',
-            'role': '',
+            'role': 'User', // Default role is User, not Admin
             'position': '',
             'about': '',
             'organization': '',
