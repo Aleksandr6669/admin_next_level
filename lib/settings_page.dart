@@ -169,7 +169,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                 ),
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final cardWidth = constraints.maxWidth > 1100 ? (constraints.maxWidth - 40) / 3 : constraints.maxWidth;
+                  final cardWidth = constraints.maxWidth > 850 ? (constraints.maxWidth - 40) / 3 : constraints.maxWidth;
                   return Wrap(
                     spacing: 20,
                     runSpacing: 20,
@@ -223,7 +223,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   Widget _buildProfileCard(AppLocalizations l10n) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 550,
+      height: 450,
       borderRadius: 20,
       blur: 15,
       border: 0,
@@ -283,7 +283,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   Widget _buildSchoolCard(AppLocalizations l10n) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 550,
+      height: 450,
       borderRadius: 20,
       blur: 15,
       border: 0,
@@ -412,7 +412,7 @@ class _UsersCardState extends State<_UsersCard> {
   Widget build(BuildContext context) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 550,
+      height: 450,
       borderRadius: 20,
       blur: 15,
       border: 0,
