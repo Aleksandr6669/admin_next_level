@@ -43,7 +43,8 @@ class AuthWrapper extends StatelessWidget {
             if (adminDocSnapshot.hasData && adminDocSnapshot.data!.exists) {
               
               // Обновляем дату последнего входа в коллекции 'users'.
-              FirebaseFirestore.instance.collection('users').doc(user.uid).update({'lastLoginDate': Timestamp.now()});
+              FirebaseFirestore.instance.collection('users').doc(user.uid).set({'lastLoginDate': Timestamp.now()}, SetOptions(merge: true));
+
 
               // Проверяем, подтверждена ли почта, и показываем соответствующую страницу.
               if (user.emailVerified) {
@@ -60,16 +61,21 @@ class AuthWrapper extends StatelessWidget {
               final l10n = AppLocalizations.of(context)!;
               final errorMessage = l10n.accessDeniedNotAdmin;
               
-              // Используем WidgetsBinding, чтобы избежать ошибок при изменении состояния во время сборки.
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                auth.FirebaseAuth.instance.signOut();
-              });
+              
               
               // Показываем страницу входа с сообщением об ошибке.
-              return AuthPage(
-                changeLanguage: changeLanguage,
-                initialErrorMessage: errorMessage,
-              );
+              if (user.emailVerified) {
+                // Используем WidgetsBinding, чтобы избежать ошибок при изменении состояния во время сборки.
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  auth.FirebaseAuth.instance.signOut();
+                });
+                return AuthPage(
+                  changeLanguage: changeLanguage,
+                  initialErrorMessage: errorMessage,
+                );
+              } else {
+                return const VerifyEmailPage();
+              }
             }
           },
         );

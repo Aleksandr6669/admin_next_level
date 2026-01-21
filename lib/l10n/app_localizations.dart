@@ -677,6 +677,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total Users: {count}'**
   String totalUsers(int count);
+
+  /// No description provided for @adminsAndTeachers.
+  ///
+  /// In en, this message translates to:
+  /// **'Admins and Teachers'**
+  String get adminsAndTeachers;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @studentsList.
+  ///
+  /// In en, this message translates to:
+  /// **'Students List'**
+  String get studentsList;
+
+  /// No description provided for @createSchool.
+  ///
+  /// In en, this message translates to:
+  /// **'Create School'**
+  String get createSchool;
+
+  /// No description provided for @schoolCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'School created successfully!'**
+  String get schoolCreated;
+
+  /// No description provided for @noSchoolMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No school is associated with this account. Create one to get started.'**
+  String get noSchoolMessage;
+
+  /// No description provided for @enterSchoolName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the school name.'**
+  String get enterSchoolName;
 }
 
 class _AppLocalizationsDelegate

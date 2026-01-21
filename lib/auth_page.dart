@@ -93,18 +93,22 @@ class _AuthPageState extends State<AuthPage> {
           );
 
           // Check for admin privileges in the 'admins' collection
-          final adminDoc = await FirebaseFirestore.instance.collection('admins').doc(userCredential.user!.uid).get();
+          // final adminDoc = await FirebaseFirestore.instance.collection('admins').doc(userCredential.user!.uid).get();
           
-          if (!adminDoc.exists) {
-            // If not an admin, sign out and throw an error
-            await FirebaseAuth.instance.signOut();
-            throw FirebaseAuthException(code: 'admin-only-access');
-          } else {
-            // If user is an admin, update their last login date in the 'users' collection
-             await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).update({
+          // if (!adminDoc.exists) {
+          //   // If not an admin, sign out and throw an error
+          //   // await FirebaseAuth.instance.signOut();
+          //   throw FirebaseAuthException(code: 'admin-only-access');
+          // } else {
+          //   // If user is an admin, update their last login date in the 'users' collection
+          //    await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).update({
+          //     'lastLoginDate': Timestamp.now(),
+          //   });
+          // }
+          // If user is an admin, update their last login date in the 'users' collection
+          await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
               'lastLoginDate': Timestamp.now(),
-            });
-          }
+            },SetOptions(merge: true));
         } else {
           // Registration: Create user
           UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(

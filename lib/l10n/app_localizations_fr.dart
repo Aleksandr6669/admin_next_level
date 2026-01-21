@@ -269,37 +269,38 @@ class AppLocalizationsFr extends AppLocalizations {
   String get users => 'Utilisateurs';
 
   @override
-  String get tooltipCollapse => 'Collapse';
+  String get tooltipCollapse => 'Réduire';
 
   @override
-  String get tooltipExpand => 'Expand';
+  String get tooltipExpand => 'Développer';
 
   @override
-  String get accessDeniedNotAdmin => 'Access denied. Only admins can log in.';
+  String get accessDeniedNotAdmin =>
+      'Accès refusé. Seuls les administrateurs peuvent se connecter.';
 
   @override
-  String get schoolInfo => 'School Info';
+  String get schoolInfo => 'Infos sur l\'école';
 
   @override
-  String get editSchool => 'Edit School';
+  String get editSchool => 'Modifier l\'école';
 
   @override
-  String get userList => 'User List';
+  String get userList => 'Liste des utilisateurs';
 
   @override
-  String get about => 'About';
+  String get about => 'À propos';
 
   @override
   String get contact => 'Contact';
 
   @override
-  String get students => 'Students';
+  String get students => 'Étudiants';
 
   @override
-  String get schoolName => 'School Name';
+  String get schoolName => 'Nom de l\'école';
 
   @override
-  String get save => 'Save';
+  String get save => 'Enregistrer';
 
   @override
   String get deleteUser => 'Supprimer l\'utilisateur';
@@ -315,4 +316,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String totalUsers(int count) {
     return 'Utilisateurs totaux: $count';
   }
+
+  @override
+  String get adminsAndTeachers => 'Administrateurs et enseignants';
+
+  @override
+  String get add => 'Ajouter';
+
+  @override
+  String get studentsList => 'Liste des étudiants';
+
+  @override
+  String get createSchool => 'Créer une école';
+
+  @override
+  String get schoolCreated => 'École créée avec succès !';
+
+  @override
+  String get noSchoolMessage =>
+      'Aucune école n\'est associée à ce compte. Créez-en une pour commencer.';
+
+  @override
+  String get enterSchoolName => 'Veuillez saisir le nom de l\'école.';
 }

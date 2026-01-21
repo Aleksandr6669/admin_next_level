@@ -44,6 +44,8 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   String _avatarUrl = '';
   late Language _selectedLanguage;
   late Stream<QuerySnapshot> _usersStream;
+  late Stream<QuerySnapshot> _adminsStream;
+  late Stream<QuerySnapshot> _studentsStream;
 
   final _scrollController = ScrollController();
 
@@ -51,6 +53,13 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   void initState() {
     super.initState();
     _usersStream = FirebaseFirestore.instance.collection('users').snapshots();
+    _adminsStream = FirebaseFirestore.instance
+        .collection('users')
+        .where('role', whereIn: ['admin', 'teacher']).snapshots();
+    _studentsStream = FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'student').snapshots();
+        
     _loadProfileFromLocalStorage();
     _subscribeToProfileUpdates();
   }
@@ -182,6 +191,16 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                         _UsersCard(l10n: l10n, usersStream: _usersStream),
                         width: cardWidth,
                       ),
+                      _buildColumnWithTitle(
+                        l10n.adminsAndTeachers,
+                        _UsersCard(l10n: l10n, usersStream: _adminsStream, title: l10n.adminsAndTeachers, showAddButton: true),
+                        width: cardWidth,
+                      ),
+                      _buildColumnWithTitle(
+                        l10n.studentsList,
+                        _UsersCard(l10n: l10n, usersStream: _studentsStream, title: l10n.studentsList, showAddButton: true),
+                        width: cardWidth,
+                      ),
                     ],
                   );
                 },
@@ -223,7 +242,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   Widget _buildProfileCard(AppLocalizations l10n) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 450,
+      height: 580,
       borderRadius: 20,
       blur: 15,
       border: 0,
@@ -283,7 +302,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   Widget _buildSchoolCard(AppLocalizations l10n) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 450,
+      height: 580,
       borderRadius: 20,
       blur: 15,
       border: 0,
@@ -378,8 +397,15 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
 class _UsersCard extends StatefulWidget {
   final AppLocalizations l10n;
   final Stream<QuerySnapshot> usersStream;
+  final String? title;
+  final bool showAddButton;
 
-  const _UsersCard({required this.l10n, required this.usersStream});
+  const _UsersCard({
+    required this.l10n,
+    required this.usersStream,
+    this.title,
+    this.showAddButton = false,
+  });
 
   @override
   State<_UsersCard> createState() => _UsersCardState();
@@ -412,7 +438,7 @@ class _UsersCardState extends State<_UsersCard> {
   Widget build(BuildContext context) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 450,
+      height: 580,
       borderRadius: 20,
       blur: 15,
       border: 0,
@@ -437,7 +463,15 @@ class _UsersCardState extends State<_UsersCard> {
           child: Row(children: [
             const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people, color: Colors.white)),
             const SizedBox(width: 15),
-            Text(widget.l10n.userList, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold))
+            Text(widget.title ?? widget.l10n.userList, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const Spacer(),
+            if (widget.showAddButton)
+              IconButton(
+                icon: const Icon(Icons.add, color: Colors.white),
+                onPressed: () {
+                  // TODO: Реализовать логику добавления пользователя
+                },
+              ),
           ]),
         ),
         Expanded(

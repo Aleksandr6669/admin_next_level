@@ -1,17 +1,6 @@
 {
   "fr": [
     "phoneNumber",
-    "gender",
-    "tooltipCollapse",
-    "tooltipExpand",
-    "accessDeniedNotAdmin",
-    "schoolInfo",
-    "editSchool",
-    "userList",
-    "about",
-    "contact",
-    "students",
-    "schoolName",
-    "save"
+    "gender"
   ]
 }

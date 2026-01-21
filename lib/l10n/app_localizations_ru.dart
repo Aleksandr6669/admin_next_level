@@ -315,4 +315,26 @@ class AppLocalizationsRu extends AppLocalizations {
   String totalUsers(int count) {
     return 'Всего пользователей: $count';
   }
+
+  @override
+  String get adminsAndTeachers => 'Администраторы и учителя';
+
+  @override
+  String get add => 'Добавить';
+
+  @override
+  String get studentsList => 'Список учеников';
+
+  @override
+  String get createSchool => 'Создать школу';
+
+  @override
+  String get schoolCreated => 'Школа успешно создана!';
+
+  @override
+  String get noSchoolMessage =>
+      'С этим аккаунтом не связана ни одна школа. Создайте ее, чтобы начать.';
+
+  @override
+  String get enterSchoolName => 'Пожалуйста, введите название школы.';
 }

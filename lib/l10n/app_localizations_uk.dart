@@ -315,4 +315,26 @@ class AppLocalizationsUk extends AppLocalizations {
   String totalUsers(int count) {
     return 'Всього користувачів: $count';
   }
+
+  @override
+  String get adminsAndTeachers => 'Адміністратори та вчителі';
+
+  @override
+  String get add => 'Додати';
+
+  @override
+  String get studentsList => 'Список учнів';
+
+  @override
+  String get createSchool => 'Створити школу';
+
+  @override
+  String get schoolCreated => 'Школу успішно створено!';
+
+  @override
+  String get noSchoolMessage =>
+      'З цим акаунтом не пов’язана жодна школа. Створіть її, щоб почати.';
+
+  @override
+  String get enterSchoolName => 'Будь ласка, введіть назву школи.';
 }

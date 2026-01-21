@@ -86,6 +86,17 @@
     "searchHint": "Rechercher...",
     "schoolProfile": "Profil de l'école",
     "users": "Utilisateurs",
+    "tooltipCollapse": "Réduire",
+    "tooltipExpand": "Développer",
+    "accessDeniedNotAdmin": "Accès refusé. Seuls les administrateurs peuvent se connecter.",
+    "schoolInfo": "Infos sur l'école",
+    "editSchool": "Modifier l'école",
+    "userList": "Liste des utilisateurs",
+    "about": "À propos",
+    "contact": "Contact",
+    "students": "Étudiants",
+    "schoolName": "Nom de l'école",
+    "save": "Enregistrer",
     "deleteUser": "Supprimer l'utilisateur",
     "deleteUserConfirmation": "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.",
     "delete": "Supprimer",
@@ -96,5 +107,12 @@
                 "type": "int"
             }
         }
-    }
+    },
+    "adminsAndTeachers": "Administrateurs et enseignants",
+    "add": "Ajouter",
+    "studentsList": "Liste des étudiants",
+    "createSchool": "Créer une école",
+    "schoolCreated": "École créée avec succès !",
+    "noSchoolMessage": "Aucune école n'est associée à ce compte. Créez-en une pour commencer.",
+    "enterSchoolName": "Veuillez saisir le nom de l'école."
 }

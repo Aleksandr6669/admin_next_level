@@ -116,5 +116,12 @@
                 "type": "int"
             }
         }
-    }
+    },
+    "adminsAndTeachers": "Admins and Teachers",
+    "add": "Add",
+    "studentsList": "Students List",
+    "createSchool": "Create School",
+    "schoolCreated": "School created successfully!",
+    "noSchoolMessage": "No school is associated with this account. Create one to get started.",
+    "enterSchoolName": "Please enter the school name."
 }

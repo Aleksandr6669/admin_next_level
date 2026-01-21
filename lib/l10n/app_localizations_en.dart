@@ -309,4 +309,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String totalUsers(int count) {
     return 'Total Users: $count';
   }
+
+  @override
+  String get adminsAndTeachers => 'Admins and Teachers';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get studentsList => 'Students List';
+
+  @override
+  String get createSchool => 'Create School';
+
+  @override
+  String get schoolCreated => 'School created successfully!';
+
+  @override
+  String get noSchoolMessage =>
+      'No school is associated with this account. Create one to get started.';
+
+  @override
+  String get enterSchoolName => 'Please enter the school name.';
 }
