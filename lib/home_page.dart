@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:nextlevel/courses_page.dart';
 import 'package:nextlevel/feed_page.dart';
 import 'package:nextlevel/liquid_nav_bar.dart';
-import 'package:nextlevel/parallax_background.dart';
 import 'package:nextlevel/progress_page.dart';
 import 'package:nextlevel/settings_page.dart';
 import 'package:nextlevel/tests_page.dart';
@@ -202,8 +201,13 @@ class _HomePageState extends State<HomePage> {
             }
             final user = snapshot.data ?? AppUser(name: 'Loading...', role: '');
 
-            return ParallaxBackground(
-              backgroundImage: 'assets/background.jpg',
+            return Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/background.jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
               child: Column(
                 children: [
                   _buildHeader(context, user),

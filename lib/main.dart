@@ -26,12 +26,22 @@ class _MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en');
   
   late final AuthWrapper _authWrapper;
+  bool _isImagePrecached = false;
 
   @override
   void initState() {
     super.initState();
     _authWrapper = AuthWrapper(changeLanguage: _changeLanguage);
     _loadLocale();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isImagePrecached) {
+      precacheImage(const AssetImage('assets/background.jpg'), context);
+      _isImagePrecached = true;
+    }
   }
 
   void _loadLocale() async {
