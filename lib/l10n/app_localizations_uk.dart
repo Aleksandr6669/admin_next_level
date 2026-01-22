@@ -337,4 +337,57 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get enterSchoolName => 'Будь ласка, введіть назву школи.';
+
+  @override
+  String get school => 'Школа';
+
+  @override
+  String get schoolDirection => 'Напрямок';
+
+  @override
+  String get creationDate => 'Дата створення';
+
+  @override
+  String get adminName => 'Ім\'я адміністратора';
+
+  @override
+  String get schoolGroups => 'Групи';
+
+  @override
+  String get phone => 'Телефон';
+
+  @override
+  String get admins => 'Адміністратори';
+
+  @override
+  String get teachers => 'Викладачі';
+
+  @override
+  String get addUser => 'Додати користувача';
+
+  @override
+  String get removeUser => 'Видалити користувача зі школи';
+
+  @override
+  String removeUserConfirmation(String userName) {
+    return 'Ви впевнені, що хочете видалити $userName зі школи?';
+  }
+
+  @override
+  String get searchUserByEmail => 'Пошук користувача за email';
+
+  @override
+  String get userAddedSuccess => 'Користувача додано';
+
+  @override
+  String get userRemovedSuccess => 'Користувача видалено';
+
+  @override
+  String get noUsersInList => 'У цьому списку ще немає користувачів';
+
+  @override
+  String get searchNoUsersFound => 'Користувачів не знайдено';
+
+  @override
+  String get searchTypeEmail => 'Введіть email для пошуку';
 }

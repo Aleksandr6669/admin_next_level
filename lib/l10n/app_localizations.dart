@@ -719,6 +719,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter the school name.'**
   String get enterSchoolName;
+
+  /// No description provided for @school.
+  ///
+  /// In en, this message translates to:
+  /// **'School'**
+  String get school;
+
+  /// No description provided for @schoolDirection.
+  ///
+  /// In en, this message translates to:
+  /// **'Direction'**
+  String get schoolDirection;
+
+  /// No description provided for @creationDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Creation Date'**
+  String get creationDate;
+
+  /// No description provided for @adminName.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin Name'**
+  String get adminName;
+
+  /// No description provided for @schoolGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get schoolGroups;
+
+  /// No description provided for @phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// No description provided for @admins.
+  ///
+  /// In en, this message translates to:
+  /// **'Administrators'**
+  String get admins;
+
+  /// No description provided for @teachers.
+  ///
+  /// In en, this message translates to:
+  /// **'Teachers'**
+  String get teachers;
+
+  /// No description provided for @addUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Add User'**
+  String get addUser;
+
+  /// No description provided for @removeUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove user from school'**
+  String get removeUser;
+
+  /// No description provided for @removeUserConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove {userName} from the school?'**
+  String removeUserConfirmation(String userName);
+
+  /// No description provided for @searchUserByEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Search user by email'**
+  String get searchUserByEmail;
+
+  /// No description provided for @userAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'User added successfully'**
+  String get userAddedSuccess;
+
+  /// No description provided for @userRemovedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'User removed successfully'**
+  String get userRemovedSuccess;
+
+  /// No description provided for @noUsersInList.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no users in this list yet'**
+  String get noUsersInList;
+
+  /// No description provided for @searchNoUsersFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No users found'**
+  String get searchNoUsersFound;
+
+  /// No description provided for @searchTypeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email to search'**
+  String get searchTypeEmail;
 }
 
 class _AppLocalizationsDelegate

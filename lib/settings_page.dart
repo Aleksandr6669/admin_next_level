@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nextlevel/l10n/app_localizations.dart';
 import 'package:nextlevel/profile_service.dart';
@@ -28,6 +29,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   bool _isProfileEditing = false;
   bool _isSchoolEditing = false;
   bool _isConnected = true;
+  bool _schoolExists = false;
 
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -36,32 +38,31 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   final _organizationController = TextEditingController();
   final _aboutController = TextEditingController();
 
-  final _schoolNameController = TextEditingController(text: "NextLevel School");
-  final _schoolAboutController = TextEditingController(text: "NextLevel: Online learning platform");
-  final _schoolContactController = TextEditingController(text: "info@nextlevel.com");
-  final _schoolStudentsController = TextEditingController(text: "1500 students");
+  final _schoolNameController = TextEditingController();
+  final _schoolDirectionController = TextEditingController();
+  final _schoolCreationDateController = TextEditingController();
+  final _schoolEmailController = TextEditingController();
+  final _schoolPhoneController = TextEditingController();
+  final _schoolAdminNameController = TextEditingController();
+  final _schoolAboutController = TextEditingController();
 
   String _avatarUrl = '';
   late Language _selectedLanguage;
-  late Stream<QuerySnapshot> _usersStream;
-  late Stream<QuerySnapshot> _adminsStream;
-  late Stream<QuerySnapshot> _studentsStream;
 
   final _scrollController = ScrollController();
+  StreamSubscription? _profileSubscription;
+  StreamSubscription? _schoolSubscription;
+  
+  List<String> _adminIds = [];
+  List<String> _teacherIds = [];
+  List<String> _studentIds = [];
 
   @override
   void initState() {
     super.initState();
-    _usersStream = FirebaseFirestore.instance.collection('users').snapshots();
-    _adminsStream = FirebaseFirestore.instance
-        .collection('users')
-        .where('role', whereIn: ['admin', 'teacher']).snapshots();
-    _studentsStream = FirebaseFirestore.instance
-        .collection('users')
-        .where('role', isEqualTo: 'student').snapshots();
-        
     _loadProfileFromLocalStorage();
     _subscribeToProfileUpdates();
+    _subscribeToSchoolUpdates();
   }
 
   Future<void> _loadProfileFromLocalStorage() async {
@@ -110,13 +111,17 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
     _organizationController.dispose();
     _aboutController.dispose();
     _schoolNameController.dispose();
+    _schoolDirectionController.dispose();
+    _schoolCreationDateController.dispose();
+    _schoolEmailController.dispose();
+    _schoolPhoneController.dispose();
+    _schoolAdminNameController.dispose();
     _schoolAboutController.dispose();
-    _schoolContactController.dispose();
-    _schoolStudentsController.dispose();
+    _profileSubscription?.cancel();
+    _schoolSubscription?.cancel();
     super.dispose();
   }
 
-  StreamSubscription? _profileSubscription;
   void _subscribeToProfileUpdates() {
     _profileSubscription?.cancel();
     _profileSubscription = _profileService.getUserProfile().listen((userProfile) {
@@ -139,7 +144,45 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
     });
   }
 
+  void _subscribeToSchoolUpdates() {
+    _schoolSubscription?.cancel();
+    _schoolSubscription = _profileService.getSchoolProfile().listen((snapshot) {
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        if (mounted) {
+          setState(() {
+            _schoolExists = true;
+            if (!_isSchoolEditing) {
+              _schoolNameController.text = data['name'] ?? '';
+              _schoolDirectionController.text = data['direction'] ?? '';
+              _schoolCreationDateController.text = data['creationDate'] ?? '';
+              _schoolEmailController.text = data['email'] ?? '';
+              _schoolPhoneController.text = data['phone'] ?? '';
+              _schoolAdminNameController.text = data['adminName'] ?? '';
+              _schoolAboutController.text = data['about'] ?? '';
+            }
+            _adminIds = List<String>.from(data['admins'] ?? []);
+            _teacherIds = List<String>.from(data['teachers'] ?? []);
+            _studentIds = List<String>.from(data['students'] ?? []);
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _schoolExists = false;
+            _adminIds = [];
+            _teacherIds = [];
+            _studentIds = [];
+          });
+        }
+      }
+    }, onError: (e) {
+       if (mounted) setState(() => _isConnected = false);
+    });
+  }
+
   Future<void> _updateProfile() async {
+    if (!_isConnected) return;
     try {
       final dataToUpdate = {
         'name': _nameController.text,
@@ -152,8 +195,30 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
       };
       await _profileService.updateUserProfile(dataToUpdate);
       await _saveProfileToLocalStorage(dataToUpdate);
-      setState(() => _isProfileEditing = false);
-      widget.onEditModeChange(false);
+      if (mounted) {
+        setState(() => _isProfileEditing = false);
+        widget.onEditModeChange(false);
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isConnected = false);
+    }
+  }
+
+  Future<void> _updateSchool() async {
+    if (!_isConnected) return;
+    try {
+      final dataToUpdate = {
+        'name': _schoolNameController.text,
+        'direction': _schoolDirectionController.text,
+        'email': _schoolEmailController.text,
+        'phone': _schoolPhoneController.text,
+        'adminName': _schoolAdminNameController.text,
+        'about': _schoolAboutController.text,
+      };
+      await _profileService.updateSchoolProfile(dataToUpdate);
+      if (mounted) {
+        setState(() => _isSchoolEditing = false);
+      }
     } catch (e) {
       if (mounted) setState(() => _isConnected = false);
     }
@@ -186,21 +251,41 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                     children: [
                       _buildColumnWithTitle(l10n.profileTitle, _buildProfileCard(l10n), width: cardWidth),
                       _buildColumnWithTitle(l10n.schoolProfile, _buildSchoolCard(l10n), width: cardWidth),
-                      _buildColumnWithTitle(
-                        l10n.users,
-                        _UsersCard(l10n: l10n, usersStream: _usersStream),
-                        width: cardWidth,
-                      ),
-                      _buildColumnWithTitle(
-                        l10n.adminsAndTeachers,
-                        _UsersCard(l10n: l10n, usersStream: _adminsStream, title: l10n.adminsAndTeachers, showAddButton: true),
-                        width: cardWidth,
-                      ),
-                      _buildColumnWithTitle(
-                        l10n.studentsList,
-                        _UsersCard(l10n: l10n, usersStream: _studentsStream, title: l10n.studentsList, showAddButton: true),
-                        width: cardWidth,
-                      ),
+                      if (_schoolExists) ...[
+                         _buildColumnWithTitle(
+                          l10n.admins,
+                          _SchoolUsersCard(
+                            key: ValueKey('admins_${_adminIds.length}'), // Важно для перестроения виджета
+                            l10n: l10n,
+                            userIds: _adminIds,
+                            role: 'admins',
+                            profileService: _profileService
+                          ),
+                          width: cardWidth,
+                        ),
+                        _buildColumnWithTitle(
+                          l10n.teachers,
+                           _SchoolUsersCard(
+                            key: ValueKey('teachers_${_teacherIds.length}'),
+                            l10n: l10n, 
+                            userIds: _teacherIds, 
+                            role: 'teachers', 
+                            profileService: _profileService
+                          ),
+                          width: cardWidth,
+                        ),
+                        _buildColumnWithTitle(
+                          l10n.students,
+                           _SchoolUsersCard(
+                            key: ValueKey('students_${_studentIds.length}'),
+                            l10n: l10n, 
+                            userIds: _studentIds, 
+                            role: 'students', 
+                            profileService: _profileService
+                           ),
+                          width: cardWidth,
+                        ),
+                      ]
                     ],
                   );
                 },
@@ -242,7 +327,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   Widget _buildProfileCard(AppLocalizations l10n) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 580,
+      height: 650,
       borderRadius: 20,
       blur: 15,
       border: 0,
@@ -265,7 +350,10 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
               TextButton.icon(
                 icon: const Icon(Icons.edit, size: 16, color: Colors.blueAccent),
                 label: Text(l10n.editProfile, style: const TextStyle(color: Colors.blueAccent)),
-                onPressed: () => setState(() => _isProfileEditing = true),
+                onPressed: () => setState(() {
+                  _isProfileEditing = true;
+                  widget.onEditModeChange(true);
+                }),
               ),
               const Spacer(),
               _buildInfoRow(l10n.role, _roleController.text),
@@ -288,7 +376,11 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TextButton(onPressed: () => setState(() => _isProfileEditing = false), child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),),
+                  TextButton(onPressed: () => setState((){
+                    _isProfileEditing = false;
+                    widget.onEditModeChange(false);
+                    _subscribeToProfileUpdates();
+                  }), child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),),
                   ElevatedButton(onPressed: _updateProfile, child: Text(l10n.saveChanges)),
                 ],
               )
@@ -302,7 +394,7 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
   Widget _buildSchoolCard(AppLocalizations l10n) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 580,
+      height: 650,
       borderRadius: 20,
       blur: 15,
       border: 0,
@@ -311,45 +403,73 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.school, color: Colors.white)),
-                const SizedBox(width: 15),
-                Text(l10n.schoolInfo, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-              ],
+            const CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.white24,
+              child: Icon(Icons.school, size: 50, color: Colors.white),
             ),
-            const SizedBox(height: 20),
-            if (!_isSchoolEditing) ...[
-              _buildInfoRow(l10n.schoolName, _schoolNameController.text),
-              _buildInfoRow(l10n.about, _schoolAboutController.text),
-              _buildInfoRow(l10n.contact, _schoolContactController.text),
-              _buildInfoRow(l10n.students, _schoolStudentsController.text),
+            const SizedBox(height: 15),
+            if (!_schoolExists && !_isSchoolEditing) ...[
               const Spacer(),
-              Center(
-                child: TextButton.icon(
-                  icon: const Icon(Icons.edit, size: 16, color: Colors.blueAccent),
-                  label: Text(l10n.editSchool, style: const TextStyle(color: Colors.blueAccent)),
-                  onPressed: () => setState(() => _isSchoolEditing = true),
-                ),
+              Text(l10n.noSchoolMessage, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
+              const Spacer(),
+              ElevatedButton(
+                onPressed: () => setState(() {
+                  _isSchoolEditing = true;
+                  _schoolNameController.clear();
+                  _schoolDirectionController.clear();
+                  _schoolCreationDateController.clear();
+                  _schoolEmailController.clear();
+                  _schoolPhoneController.clear();
+                  _schoolAdminNameController.clear();
+                  _schoolAboutController.clear();
+                }),
+                child: Text(l10n.createSchool),
               ),
+            ] else if (!_isSchoolEditing) ...[
+              Text(_schoolNameController.text.isEmpty ? l10n.schoolName : _schoolNameController.text,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              TextButton.icon(
+                icon: const Icon(Icons.edit, size: 16, color: Colors.blueAccent),
+                label: Text(l10n.editSchool, style: const TextStyle(color: Colors.blueAccent)),
+                onPressed: () => setState(() => _isSchoolEditing = true),
+              ),
+              const Spacer(),
+              _buildInfoRow(l10n.schoolName, _schoolNameController.text),
+              _buildInfoRow(l10n.schoolDirection, _schoolDirectionController.text),
+              _buildInfoRow(l10n.creationDate, _schoolCreationDateController.text),
+              _buildInfoRow(l10n.email, _schoolEmailController.text),
+              _buildInfoRow(l10n.phone, _schoolPhoneController.text),
+              _buildInfoRow(l10n.adminName, _schoolAdminNameController.text),
+              _buildInfoRow(l10n.about, _schoolAboutController.text, maxLines: 2),
             ] else ...[
               Expanded(
                 child: ListView(
                   children: [
                     _buildTextField(_schoolNameController, l10n.schoolName),
-                    _buildTextField(_schoolAboutController, l10n.about),
-                    _buildTextField(_schoolContactController, l10n.contact),
-                    _buildTextField(_schoolStudentsController, l10n.students),
+                    _buildTextField(_schoolDirectionController, l10n.schoolDirection),
+                    _buildTextField(_schoolCreationDateController, l10n.creationDate, enabled: false),
+                    _buildTextField(_schoolEmailController, l10n.email),
+                    _buildTextField(_schoolPhoneController, l10n.phone),
+                    _buildTextField(_schoolAdminNameController, l10n.adminName),
+                    _buildTextField(_schoolAboutController, l10n.about, maxLines: 2),
                   ],
                 ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TextButton(onPressed: () => setState(() => _isSchoolEditing = false), child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),),
-                  ElevatedButton(onPressed: () => setState(() => _isSchoolEditing = false), child: Text(l10n.saveChanges)),
+                  TextButton(onPressed: () => setState(() {
+                    _isSchoolEditing = false;
+                    _subscribeToSchoolUpdates();
+                    }), 
+                    child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),),
+                  ElevatedButton(
+                    onPressed: _updateSchool, 
+                    child: Text(_schoolExists ? l10n.saveChanges : l10n.createSchool)
+                  ),
                 ],
               )
             ],
@@ -361,327 +481,267 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
 
   Widget _buildInfoRow(String title, String value, {int maxLines = 1}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+          Text(title, style: const TextStyle(color: Colors.white54, fontSize: 10)),
           Text(value.isEmpty ? '-' : value,
               maxLines: maxLines,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 16)),
-          const Divider(color: Colors.white10),
+              style: const TextStyle(color: Colors.white, fontSize: 14)),
+          const Divider(color: Colors.white10, height: 8),
         ],
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, {int maxLines = 1}) {
+  Widget _buildTextField(TextEditingController controller, String label, {int maxLines = 1, bool enabled = true}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: TextField(
         controller: controller,
+        enabled: enabled,
         maxLines: maxLines,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: enabled ? Colors.white : Colors.white38, fontSize: 14),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: Colors.white60),
+          labelStyle: const TextStyle(color: Colors.white60, fontSize: 12),
           enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
           focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+          disabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white10)),
         ),
       ),
     );
   }
 }
 
-class _UsersCard extends StatefulWidget {
+class _SchoolUsersCard extends StatefulWidget {
   final AppLocalizations l10n;
-  final Stream<QuerySnapshot> usersStream;
-  final String? title;
-  final bool showAddButton;
+  final List<String> userIds;
+  final String role;
+  final ProfileService profileService;
 
-  const _UsersCard({
+  const _SchoolUsersCard({
+    super.key, 
     required this.l10n,
-    required this.usersStream,
-    this.title,
-    this.showAddButton = false,
+    required this.userIds,
+    required this.role,
+    required this.profileService,
   });
 
   @override
-  State<_UsersCard> createState() => _UsersCardState();
+  State<_SchoolUsersCard> createState() => _SchoolUsersCardState();
 }
 
-class _UsersCardState extends State<_UsersCard> {
-  String? _editingUserId;
-  Map<String, dynamic>? _editingUserData;
-  bool _isConfirmingDelete = false;
+class _SchoolUsersCardState extends State<_SchoolUsersCard> {
+  bool _isSearching = false;
+  final _searchController = TextEditingController();
+  List<DocumentSnapshot> _searchResults = [];
+  Timer? _debounce;
 
-  final _editUserNameController = TextEditingController();
-  final _editUserLastNameController = TextEditingController();
-  final _editUserEmailController = TextEditingController();
-  final _editUserRoleController = TextEditingController();
-  final _editUserPositionController = TextEditingController();
-  final _editUserOrganizationController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
 
   @override
   void dispose() {
-    _editUserNameController.dispose();
-    _editUserLastNameController.dispose();
-    _editUserEmailController.dispose();
-    _editUserRoleController.dispose();
-    _editUserPositionController.dispose();
-    _editUserOrganizationController.dispose();
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      if (_searchController.text.isNotEmpty) {
+        widget.profileService.searchUsersByEmail(_searchController.text.toLowerCase()).then((results) {
+          if (mounted) setState(() => _searchResults = results);
+        });
+      } else {
+        if (mounted) setState(() => _searchResults = []);
+      }
+    });
+  }
+
+  void _showRemoveUserDialog(BuildContext context, String userId, String userName) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xAA222222),
+        title: Text(widget.l10n.removeUser, style: const TextStyle(color: Colors.white)),
+        content: Text(widget.l10n.removeUserConfirmation(userName), style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(widget.l10n.cancel, style: const TextStyle(color: Colors.blueAccent))),
+          ElevatedButton(
+            onPressed: () async {
+              await widget.profileService.removeUserFromSchool(userId, widget.role);
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(widget.l10n.userRemovedSuccess), backgroundColor: Colors.green));
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            child: Text(widget.l10n.delete, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _addUser(String userId) async {
+    await widget.profileService.addUserToSchool(userId, widget.role);
+    _searchController.clear();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(widget.l10n.userAddedSuccess), backgroundColor: Colors.green));
+  }
+
+  String _getRoleTitle() {
+    switch (widget.role) {
+      case 'admins': return widget.l10n.admins;
+      case 'teachers': return widget.l10n.teachers;
+      case 'students': return widget.l10n.students;
+      default: return '';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return GlassmorphicContainer(
       width: double.infinity,
-      height: 580,
+      height: 650,
       borderRadius: 20,
       blur: 15,
       border: 0,
       linearGradient: kGlassmorphicGradient,
       borderGradient: kGlassmorphicBorderGradient,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, animation) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        child: _editingUserId == null ? _buildUsersList() : _buildUserEditForm(),
-      ),
-    );
-  }
-
-  Widget _buildUsersList() {
-    return Column(
-      key: const ValueKey('userList'),
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(children: [
-            const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people, color: Colors.white)),
-            const SizedBox(width: 15),
-            Text(widget.title ?? widget.l10n.userList, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            const Spacer(),
-            if (widget.showAddButton)
-              IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
-                onPressed: () {
-                  // TODO: Реализовать логику добавления пользователя
-                },
-              ),
-          ]),
-        ),
-        Expanded(
-          child: StreamBuilder<QuerySnapshot>(
-            stream: widget.usersStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
-              }
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Center(child: Text('No users found', style: const TextStyle(color: Colors.white)));
-              }
-              final users = snapshot.data!.docs;
-              final userCount = users.length;
-              return Column(
-                children: [
-                  Expanded(
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: userCount,
-                      separatorBuilder: (_, __) => const Divider(color: Colors.white10),
-                      itemBuilder: (context, index) {
-                        final userDoc = users[index];
-                        final user = userDoc.data() as Map<String, dynamic>;
-                        final userId = userDoc.id;
-                        final userName = user['name'] ?? 'N/A';
-                        final userLastName = user['lastName'] ?? '';
-                        final userEmail = user['email'] ?? '';
-                        final avatarUrl = user['avatarUrl'] as String? ?? '';
-                        return ListTile(
-                          onTap: () {
-                            setState(() {
-                              _editingUserId = userId;
-                              _editingUserData = user;
-                              _editUserNameController.text = user['name'] ?? '';
-                              _editUserLastNameController.text = user['lastName'] ?? '';
-                              _editUserEmailController.text = user['email'] ?? '';
-                              _editUserRoleController.text = user['role'] ?? '';
-                              _editUserPositionController.text = user['position'] ?? '';
-                              _editUserOrganizationController.text = user['organization'] ?? '';
-                            });
-                          },
-                          contentPadding: EdgeInsets.zero,
-                          leading: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: Colors.white24,
-                              backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                              child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 20, color: Colors.white) : null),
-                          title: Text('$userName $userLastName', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                          subtitle: Text(userEmail, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                          trailing: const Icon(Icons.chevron_right, color: Colors.white24),
-                        );
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text(widget.l10n.totalUsers(userCount), style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                  ),
-                ],
-              );
-            },
+      child: Column(
+        children: [
+          _buildHeader(),
+          Expanded(
+            child: _isSearching ? _buildSearchView() : _buildUserListView(),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUserEditForm() {
-    final l10n = widget.l10n;
-    final avatarUrl = _editingUserData?['avatarUrl'] as String? ?? '';
-
-    return Scaffold(
-      key: const ValueKey('editUser'),
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            setState(() {
-              _editingUserId = null;
-              _editingUserData = null;
-              _isConfirmingDelete = false;
-            });
-          },
-        ),
-        actions: [
-          if (!_isConfirmingDelete)
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              onPressed: () {
-                setState(() {
-                  _isConfirmingDelete = true;
-                });
-              },
-            ),
+          _buildFooter(),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-        child: _isConfirmingDelete
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 50),
-                  Text(l10n.deleteUser, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 20),
-                  Text(l10n.deleteUserConfirmation,
-                      textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 16)),
-                  const SizedBox(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _isConfirmingDelete = false;
-                          });
-                        },
-                        child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          FirebaseFirestore.instance.collection('users').doc(_editingUserId!).delete();
-                          setState(() {
-                            _editingUserId = null;
-                            _editingUserData = null;
-                            _isConfirmingDelete = false;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-                        child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                ],
-              )
-            : Column(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                    child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 50) : null,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextField(_editUserNameController, l10n.firstName),
-                  _buildTextField(_editUserLastNameController, l10n.lastName),
-                  _buildTextField(_editUserEmailController, l10n.email),
-                  _buildTextField(_editUserRoleController, l10n.role),
-                  _buildTextField(_editUserPositionController, l10n.position),
-                  _buildTextField(_editUserOrganizationController, l10n.organization),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _editingUserId = null;
-                            _editingUserData = null;
-                          });
-                        },
-                        child: Text(l10n.cancel, style: const TextStyle(color: Colors.blueAccent)),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          final updatedData = {
-                            "avatarUrl": avatarUrl,
-                            'name': _editUserNameController.text,
-                            'lastName': _editUserLastNameController.text,
-                            'email': _editUserEmailController.text,
-                            'role': _editUserRoleController.text,
-                            'position': _editUserPositionController.text,
-                            'organization': _editUserOrganizationController.text,
-                          };
-                          FirebaseFirestore.instance.collection('users').doc(_editingUserId!).update(updatedData);
-                          setState(() {
-                            _editingUserId = null;
-                            _editingUserData = null;
-                          });
-                        },
-                        child: Text(l10n.save),
-                      ),
-                    ],
-                  )
-                ],
-              ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        children: [
+          const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.people_alt_outlined, color: Colors.white)),
+          const SizedBox(width: 15),
+          Text(_getRoleTitle(), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          const Spacer(),
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.add, color: Colors.white),
+            onPressed: () => setState(() {
+              _isSearching = !_isSearching;
+              if (!_isSearching) _searchController.clear();
+            }),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, {int maxLines = 1}) {
+  Widget _buildUserListView() {
+    if (widget.userIds.isEmpty) {
+      return Center(child: Text(widget.l10n.noUsersInList, style: const TextStyle(color: Colors.white70)));
+    }
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemCount: widget.userIds.length,
+      separatorBuilder: (_, __) => const Divider(color: Colors.white10, height: 1),
+      itemBuilder: (context, index) {
+        final userId = widget.userIds[index];
+        return FutureBuilder<DocumentSnapshot>(
+          future: widget.profileService.getUserById(userId),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return const ListTile(title: Text('...', style: TextStyle(color: Colors.white38)));
+            }
+            final userData = snapshot.data!.data() as Map<String, dynamic>;
+            final userName = '${userData['name'] ?? ''} ${userData['lastName'] ?? ''}'.trim();
+            final userEmail = userData['email'] ?? '';
+            final avatarUrl = userData['avatarUrl'] as String? ?? '';
+            return ListTile(
+              onTap: () => _showRemoveUserDialog(context, userId, userName.isEmpty ? userEmail : userName),
+              contentPadding: EdgeInsets.zero,
+              leading: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.white24,
+                  backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                  child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 20, color: Colors.white) : null),
+              title: Text(userName.isEmpty ? widget.l10n.userNotFound : userName, style: const TextStyle(color: Colors.white, fontSize: 14)),
+              subtitle: Text(userEmail, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+              trailing: const Icon(Icons.remove_circle_outline, color: Colors.redAccent, size: 20),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchView() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(color: Colors.white60),
-          enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-          focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        children: [
+          TextField(
+            controller: _searchController,
+            autofocus: true,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: widget.l10n.searchUserByEmail,
+              hintStyle: const TextStyle(color: Colors.white54),
+              prefixIcon: const Icon(Icons.search, color: Colors.white70),
+              enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: _searchResults.isEmpty
+                ? Center(child: Text(_searchController.text.isEmpty ? widget.l10n.searchTypeEmail : widget.l10n.searchNoUsersFound, style: const TextStyle(color: Colors.white70)))
+                : ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      final userDoc = _searchResults[index];
+                      final userData = userDoc.data() as Map<String, dynamic>;
+                      final userName = '${userData['name'] ?? ''} ${userData['lastName'] ?? ''}'.trim();
+                      final userEmail = userData['email'] ?? '';
+                      final avatarUrl = userData['avatarUrl'] as String? ?? '';
+                      final isAlreadyAdded = widget.userIds.contains(userDoc.id);
+                      return ListTile(
+                        onTap: isAlreadyAdded ? null : () => _addUser(userDoc.id),
+                        contentPadding: EdgeInsets.zero,
+                        leading: CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.white24,
+                            backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                            child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 20, color: Colors.white) : null),
+                        title: Text(userName.isEmpty ? widget.l10n.userNotFound : userName, style: TextStyle(color: isAlreadyAdded ? Colors.white38 : Colors.white, fontSize: 14)),
+                        subtitle: Text(userEmail, style: TextStyle(color: isAlreadyAdded ? Colors.white38 : Colors.white70, fontSize: 12)),
+                        trailing: isAlreadyAdded
+                            ? const Icon(Icons.check_circle, color: Colors.green, size: 20)
+                            : const Icon(Icons.add_circle_outline, color: Colors.blueAccent, size: 20),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
+    );
+  }
+  
+  Widget _buildFooter() {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Text(widget.l10n.totalUsers(widget.userIds.length), style: const TextStyle(color: Colors.white70, fontSize: 12)),
     );
   }
 }

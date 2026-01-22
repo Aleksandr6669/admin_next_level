@@ -109,7 +109,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get userNotFound =>
-      'Пользователь с такой электронной почтой не найден. Пожалуйста, зарегистрируйтесь.';
+      'Пользователь с такой электронной почтой не найден.';
 
   @override
   String get wrongPassword => 'Неверный пароль.';
@@ -337,4 +337,57 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get enterSchoolName => 'Пожалуйста, введите название школы.';
+
+  @override
+  String get school => 'Школа';
+
+  @override
+  String get schoolDirection => 'Направление';
+
+  @override
+  String get creationDate => 'Дата создания';
+
+  @override
+  String get adminName => 'Имя администратора';
+
+  @override
+  String get schoolGroups => 'Группы';
+
+  @override
+  String get phone => 'Телефон';
+
+  @override
+  String get admins => 'Администраторы';
+
+  @override
+  String get teachers => 'Преподаватели';
+
+  @override
+  String get addUser => 'Добавить пользователя';
+
+  @override
+  String get removeUser => 'Удалить пользователя из школы';
+
+  @override
+  String removeUserConfirmation(String userName) {
+    return 'Вы уверены, что хотите удалить $userName из школы?';
+  }
+
+  @override
+  String get searchUserByEmail => 'Поиск пользователя по email';
+
+  @override
+  String get userAddedSuccess => 'Пользователь добавлен';
+
+  @override
+  String get userRemovedSuccess => 'Пользователь удален';
+
+  @override
+  String get noUsersInList => 'В этом списке пока нет пользователей';
+
+  @override
+  String get searchNoUsersFound => 'Пользователи не найдены';
+
+  @override
+  String get searchTypeEmail => 'Введите email для поиска';
 }

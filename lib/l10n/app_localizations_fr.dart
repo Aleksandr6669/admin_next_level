@@ -338,4 +338,57 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get enterSchoolName => 'Veuillez saisir le nom de l\'école.';
+
+  @override
+  String get school => 'School';
+
+  @override
+  String get schoolDirection => 'Direction';
+
+  @override
+  String get creationDate => 'Creation Date';
+
+  @override
+  String get adminName => 'Admin Name';
+
+  @override
+  String get schoolGroups => 'Groups';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get admins => 'Administrators';
+
+  @override
+  String get teachers => 'Teachers';
+
+  @override
+  String get addUser => 'Add User';
+
+  @override
+  String get removeUser => 'Remove user from school';
+
+  @override
+  String removeUserConfirmation(String userName) {
+    return 'Are you sure you want to remove $userName from the school?';
+  }
+
+  @override
+  String get searchUserByEmail => 'Search user by email';
+
+  @override
+  String get userAddedSuccess => 'User added successfully';
+
+  @override
+  String get userRemovedSuccess => 'User removed successfully';
+
+  @override
+  String get noUsersInList => 'There are no users in this list yet';
+
+  @override
+  String get searchNoUsersFound => 'No users found';
+
+  @override
+  String get searchTypeEmail => 'Enter email to search';
 }

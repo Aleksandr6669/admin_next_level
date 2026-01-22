@@ -123,5 +123,29 @@
     "createSchool": "Create School",
     "schoolCreated": "School created successfully!",
     "noSchoolMessage": "No school is associated with this account. Create one to get started.",
-    "enterSchoolName": "Please enter the school name."
+    "enterSchoolName": "Please enter the school name.",
+    "school": "School",
+    "schoolDirection": "Direction",
+    "creationDate": "Creation Date",
+    "adminName": "Admin Name",
+    "schoolGroups": "Groups",
+    "phone": "Phone",
+    "admins": "Administrators",
+    "teachers": "Teachers",
+    "addUser": "Add User",
+    "removeUser": "Remove user from school",
+    "removeUserConfirmation": "Are you sure you want to remove {userName} from the school?",
+    "@removeUserConfirmation": {
+        "placeholders": {
+            "userName": {
+                "type": "String"
+            }
+        }
+    },
+    "searchUserByEmail": "Search user by email",
+    "userAddedSuccess": "User added successfully",
+    "userRemovedSuccess": "User removed successfully",
+    "noUsersInList": "There are no users in this list yet",
+    "searchNoUsersFound": "No users found",
+    "searchTypeEmail": "Enter email to search"
 }

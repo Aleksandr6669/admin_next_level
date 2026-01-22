@@ -118,7 +118,7 @@ class _AuthPageState extends State<AuthPage> {
           final now = Timestamp.now();
           // Create a user document in the 'users' collection (NOT 'admins')
           await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-            'email': _emailController.text,
+            'email': _emailController.text.toLowerCase(),
             'createdAt': now,
             'registrationDate': now,
             'lastLoginDate': now,
@@ -128,7 +128,7 @@ class _AuthPageState extends State<AuthPage> {
             'phoneNumber': '',
             'gender': '',
             'birthDate': '',
-            'role': 'User', // Default role is User, not Admin
+            'role': 'admin', // Default role is User, not Admin
             'position': '',
             'about': '',
             'organization': '',

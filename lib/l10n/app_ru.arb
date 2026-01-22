@@ -32,7 +32,7 @@
     "verify": "Подтвердить",
     "resendCode": "Отправить код еще раз",
     "invalidCode": "Неверный код подтверждения.",
-    "userNotFound": "Пользователь с такой электронной почтой не найден. Пожалуйста, зарегистрируйтесь.",
+    "userNotFound": "Пользователь с такой электронной почтой не найден.",
     "wrongPassword": "Неверный пароль.",
     "emailAlreadyInUse": "Этот адрес электронной почты уже используется другим аккаунтом.",
     "authenticationFailed": "Ошибка аутентификации. Пожалуйста, попробуйте еще раз.",
@@ -123,5 +123,29 @@
     "createSchool": "Создать школу",
     "schoolCreated": "Школа успешно создана!",
     "noSchoolMessage": "С этим аккаунтом не связана ни одна школа. Создайте ее, чтобы начать.",
-    "enterSchoolName": "Пожалуйста, введите название школы."
+    "enterSchoolName": "Пожалуйста, введите название школы.",
+    "school": "Школа",
+    "schoolDirection": "Направление",
+    "creationDate": "Дата создания",
+    "adminName": "Имя администратора",
+    "schoolGroups": "Группы",
+    "phone": "Телефон",
+    "admins": "Администраторы",
+    "teachers": "Преподаватели",
+    "addUser": "Добавить пользователя",
+    "removeUser": "Удалить пользователя из школы",
+    "removeUserConfirmation": "Вы уверены, что хотите удалить {userName} из школы?",
+    "@removeUserConfirmation": {
+        "placeholders": {
+            "userName": {
+                "type": "String"
+            }
+        }
+    },
+    "searchUserByEmail": "Поиск пользователя по email",
+    "userAddedSuccess": "Пользователь добавлен",
+    "userRemovedSuccess": "Пользователь удален",
+    "noUsersInList": "В этом списке пока нет пользователей",
+    "searchNoUsersFound": "Пользователи не найдены",
+    "searchTypeEmail": "Введите email для поиска"
 }

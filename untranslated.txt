@@ -1,6 +1,23 @@
 {
   "fr": [
     "phoneNumber",
-    "gender"
+    "gender",
+    "school",
+    "schoolDirection",
+    "creationDate",
+    "adminName",
+    "schoolGroups",
+    "phone",
+    "admins",
+    "teachers",
+    "addUser",
+    "removeUser",
+    "removeUserConfirmation",
+    "searchUserByEmail",
+    "userAddedSuccess",
+    "userRemovedSuccess",
+    "noUsersInList",
+    "searchNoUsersFound",
+    "searchTypeEmail"
   ]
 }

@@ -123,5 +123,29 @@
     "createSchool": "Створити школу",
     "schoolCreated": "Школу успішно створено!",
     "noSchoolMessage": "З цим акаунтом не пов’язана жодна школа. Створіть її, щоб почати.",
-    "enterSchoolName": "Будь ласка, введіть назву школи."
+    "enterSchoolName": "Будь ласка, введіть назву школи.",
+    "school": "Школа",
+    "schoolDirection": "Напрямок",
+    "creationDate": "Дата створення",
+    "adminName": "Ім'я адміністратора",
+    "schoolGroups": "Групи",
+    "phone": "Телефон",
+    "admins": "Адміністратори",
+    "teachers": "Викладачі",
+    "addUser": "Додати користувача",
+    "removeUser": "Видалити користувача зі школи",
+    "removeUserConfirmation": "Ви впевнені, що хочете видалити {userName} зі школи?",
+    "@removeUserConfirmation": {
+        "placeholders": {
+            "userName": {
+                "type": "String"
+            }
+        }
+    },
+    "searchUserByEmail": "Пошук користувача за email",
+    "userAddedSuccess": "Користувача додано",
+    "userRemovedSuccess": "Користувача видалено",
+    "noUsersInList": "У цьому списку ще немає користувачів",
+    "searchNoUsersFound": "Користувачів не знайдено",
+    "searchTypeEmail": "Введіть email для пошуку"
 }
