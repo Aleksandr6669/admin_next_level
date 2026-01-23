@@ -132,6 +132,7 @@ class _AuthPageState extends State<AuthPage> {
             'position': '',
             'about': '',
             'organization': '',
+            'school': [],
           });
           // Send verification email
           await userCredential.user?.sendEmailVerification();
